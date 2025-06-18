@@ -7,7 +7,7 @@
 <h2>@ViewData["Title"]</h2>
 <hr />
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
 
     <input type="hidden" asp-for="Id" />
@@ -41,12 +41,28 @@
         <input asp-for="Salary" class="form-control" />
         <span asp-validation-for="Salary" class="text-danger"></span>
     </div>
-
     <div class="mb-3">
-        <label asp-for="DepartmentId" class="form-label"></label>
+        <label asp-for="DepartmentId" class="form-label">Department</label>
         <select asp-for="DepartmentId" class="form-control" asp-items="Model.Departments"></select>
         <span asp-validation-for="DepartmentId" class="text-danger"></span>
     </div>
+
+    <div class="mb-3">
+        <label asp-for="Photo" class="form-label"></label>
+        <input asp-for="Photo" type="file" class="form-control" />
+        <span asp-validation-for="Photo" class="text-danger"></span>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <div class="mb-3">
+            <label>Current Photo:</label><br />
+            <img src="@Model.ImageUrl" alt="Employee Photo" width="150" class="img-thumbnail" />
+        </div>
+
+        <!-- ✅ Hidden input to preserve current image -->
+        <input type="hidden" asp-for="ImageUrl" />
+    }
 
     <button type="submit" class="btn btn-primary">Update</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>

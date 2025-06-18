@@ -48,3 +48,135 @@ body {
         z-index: 1;
         padding: 3rem;
     }
+
+.auth-wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1000px;
+    margin: 50px auto;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.auth-left {
+    flex: 1;
+    background: linear-gradient(135deg, #0f4c81, #1d78c1);
+    color: #fff;
+    padding: 50px 30px;
+    position: relative;
+}
+
+    .auth-left h1 {
+        font-size: 32px;
+        font-weight: 700;
+    }
+
+    .auth-left p {
+        margin-top: 20px;
+        line-height: 1.6;
+    }
+
+.auth-right {
+    flex: 1;
+    padding: 50px 40px;
+    background: #ffffff;
+}
+
+.btn-custom {
+    background-color: #0f4c81;
+    color: white;
+    border: none;
+}
+
+    .btn-custom:hover {
+        background-color: #0c3b67;
+    }
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+}
+
+    .circle.one {
+        width: 100px;
+        height: 100px;
+        bottom: -30px;
+        left: -20px;
+    }
+
+    .circle.two {
+        width: 140px;
+        height: 140px;
+        top: -40px;
+        right: -40px;
+    }
+
+
+
+.auth-wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1000px;
+    margin: 50px auto;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.auth-left {
+    flex: 1;
+    background: linear-gradient(135deg, #0f4c81, #1d78c1);
+    color: #fff;
+    padding: 50px 30px;
+    position: relative;
+}
+
+    .auth-left h1 {
+        font-size: 32px;
+        font-weight: 700;
+    }
+
+    .auth-left p {
+        margin-top: 20px;
+        line-height: 1.6;
+    }
+
+.auth-right {
+    flex: 1;
+    padding: 50px 40px;
+    background: #ffffff;
+}
+
+.btn-custom {
+    background-color: #0f4c81;
+    color: white;
+    border: none;
+}
+
+    .btn-custom:hover {
+        background-color: #0c3b67;
+    }
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+}
+
+    .circle.one {
+        width: 100px;
+        height: 100px;
+        bottom: -30px;
+        left: -20px;
+    }
+
+    .circle.two {
+        width: 140px;
+        height: 140px;
+        top: -40px;
+        right: -40px;
+    }

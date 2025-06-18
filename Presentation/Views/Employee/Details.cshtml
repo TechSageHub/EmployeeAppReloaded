@@ -8,6 +8,18 @@
 <hr />
 
 <dl class="row">
+    <dt class="col-sm-3">Photo</dt>
+    <dd class="col-sm-9">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" alt="Employee Photo" width="150" height="150" class="img-thumbnail" />
+        }
+        else
+        {
+            <span>No photo available</span>
+        }
+    </dd>
+
     <dt class="col-sm-3">First Name</dt>
     <dd class="col-sm-9">@Model.FirstName</dd>
 
@@ -22,8 +34,6 @@
 
     <dt class="col-sm-3">Salary</dt>
     <dd class="col-sm-9">@Model.Salary.ToString("C")</dd>
-
-    
 </dl>
 
 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>

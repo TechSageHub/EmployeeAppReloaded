@@ -29,6 +29,7 @@ public static class Mapper
             FirstName = employee.FirstName,
             LastName = employee.LastName,
             DepartmentId = employee.DepartmentId,
+            ImageUrl = employee.ImageUrl,
         };
     }
     public static Department ToModel(this CreateDepartmentDto createDepartmentDto)
@@ -54,6 +55,7 @@ public static class Mapper
             Email = createEmployeeDto.Email,
             FirstName = createEmployeeDto.FirstName,
             LastName = createEmployeeDto.LastName,
+
         };
     }
 

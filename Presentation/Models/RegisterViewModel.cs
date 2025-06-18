@@ -12,6 +12,7 @@ namespace Presentation.Models
         public required string Password { get; init; }
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "Password do not match")]
+
         public required string ConfirmPassword { get; set; }
     }
 }

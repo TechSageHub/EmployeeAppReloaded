@@ -1,6 +1,9 @@
 ﻿using Application.ContractMapping;
 using Application.Dtos;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Data.Context;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services.Employee;
@@ -8,10 +11,12 @@ namespace Application.Services.Employee;
 public class EmployeeService : IEmployeeService
 {
     private readonly EmployeeAppDbContext _context;
+    private readonly Cloudinary _cloudinary;
 
-    public EmployeeService(EmployeeAppDbContext context)
+    public EmployeeService(EmployeeAppDbContext context, Cloudinary cloudinary)
     {
         _context = context;
+        _cloudinary = cloudinary;
     }
 
     public async Task<EmployeeDto?> CreateEmployeeAsync(CreateEmployeeDto dto)
@@ -21,10 +26,17 @@ public class EmployeeService : IEmployeeService
             var emailExists = _context.Employees.Any(e => e.Email == dto.Email);
             if (emailExists)
             {
-                return null; 
+                return null;
             }
 
             var employee = dto.ToModel();
+
+            if (dto.Photo != null && dto.Photo.Length > 0)
+            {
+                var imageUrl = await UploadImageAsync(dto.Photo);
+                employee.ImageUrl = imageUrl;
+            }
+
             await _context.Employees.AddAsync(employee);
             await _context.SaveChangesAsync();
 
@@ -37,15 +49,14 @@ public class EmployeeService : IEmployeeService
         }
     }
 
-
     public async Task DeleteEmployeeAsync(Guid employeeId)
     {
         var employee = await _context.Employees.FindAsync(employeeId);
-
         if (employee == null)
         {
             throw new KeyNotFoundException("Employee not found.");
         }
+
         _context.Employees.Remove(employee);
         await _context.SaveChangesAsync();
     }
@@ -53,39 +64,36 @@ public class EmployeeService : IEmployeeService
     public async Task<EmployeesDto> GetAllEmployeesAsync()
     {
         var employees = await _context.Employees
-            .Include(e => e.Department) 
+            .Include(e => e.Department)
             .ToListAsync();
 
         return employees.EmployeesDto();
     }
 
-
     public async Task<EmployeeDto> GetEmployeeByIdAsync(Guid employeeId)
     {
         var employee = await _context.Employees
-       .FirstOrDefaultAsync(d => d.Id == employeeId);
+            .FirstOrDefaultAsync(d => d.Id == employeeId);
 
         if (employee == null)
             return null;
 
-
-        var employeeDto = new EmployeeDto
+        return new EmployeeDto
         {
+            Id = employee.Id,
             Salary = employee.Salary,
             HireDate = employee.HireDate,
             DepartmentId = employee.DepartmentId,
             LastName = employee.LastName,
             FirstName = employee.FirstName,
             Email = employee.Email,
+            ImageUrl = employee.ImageUrl
         };
-
-        return employeeDto;
     }
 
     public async Task<EmployeeDto> UpdateEmployeeAsync(UpdateEmployeeDto employeeDto)
     {
         var employee = await _context.Employees.FindAsync(employeeDto.Id);
-
         if (employee == null)
         {
             return null;
@@ -97,12 +105,20 @@ public class EmployeeService : IEmployeeService
         employee.Email = employeeDto.Email;
         employee.HireDate = employeeDto.HireDate;
         employee.DepartmentId = employeeDto.DepartmentId;
-        
-        
+
+       
+        if (employeeDto.Photo != null && employeeDto.Photo.Length > 0)
+        {
+            var imageUrl = await UploadImageAsync(employeeDto.Photo);
+            if (!string.IsNullOrEmpty(imageUrl))
+            {
+                employee.ImageUrl = imageUrl;
+            }
+        }
 
         await _context.SaveChangesAsync();
 
-        var updatedDto = new EmployeeDto
+        return new EmployeeDto
         {
             Id = employee.Id,
             Email = employee.Email,
@@ -110,9 +126,24 @@ public class EmployeeService : IEmployeeService
             LastName = employee.LastName,
             DepartmentId = employee.DepartmentId,
             HireDate = employee.HireDate,
-            Salary = employee.Salary
+            Salary = employee.Salary,
+            ImageUrl = employee.ImageUrl
+        };
+    }
+
+    public async Task<string> UploadImageAsync(IFormFile file)
+    {
+        using var stream = file.OpenReadStream();
+
+        var uploadParams = new ImageUploadParams
+        {
+            File = new FileDescription(file.FileName, stream),
+            Transformation = new Transformation().Width(500).Height(500).Crop("fill"),
+            Folder = "employees"
         };
 
-        return updatedDto;
+        var result = await _cloudinary.UploadAsync(uploadParams);
+
+        return result.SecureUrl.AbsoluteUri;
     }
 }

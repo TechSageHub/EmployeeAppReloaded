@@ -51,11 +51,13 @@ public class EmployeeController : BaseController
 
         var viewModel = new EmployeeViewModel
         {
+            Id = employeeDto.Id,
             FirstName = employeeDto.FirstName,
             LastName = employeeDto.LastName,
             Email = employeeDto.Email,
             HireDate = employeeDto.HireDate,
-            Salary = employeeDto.Salary
+            Salary = employeeDto.Salary,
+            ImageUrl = employeeDto.ImageUrl,
         };
 
         return View(viewModel);
@@ -82,6 +84,11 @@ public class EmployeeController : BaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateEmployeeViewModel model)
     {
+        //if (!ModelState.IsValid)
+        //{
+        //    await PopulateDepartments(model);
+        //    return View(model);
+        //}
 
         var dto = new CreateEmployeeDto
         {
@@ -91,6 +98,7 @@ public class EmployeeController : BaseController
             Salary = model.Salary,
             Email = model.Email,
             HireDate = model.HireDate,
+            Photo = model.Photo 
         };
 
         var result = await _employeeService.CreateEmployeeAsync(dto);
@@ -105,6 +113,7 @@ public class EmployeeController : BaseController
         _notyf.Success("Employee created successfully");
         return RedirectToAction(nameof(Index));
     }
+
 
 
 
@@ -127,8 +136,8 @@ public class EmployeeController : BaseController
             HireDate = employeeDto.HireDate,
             Salary = employeeDto.Salary,
             DepartmentId = employeeDto.DepartmentId,
-            Departments = departmentsDto.Departments.
-            Select(d => new SelectListItem
+            ImageUrl = employeeDto.ImageUrl,
+            Departments = departmentsDto.Departments.Select(d => new SelectListItem
             {
                 Value = d.Id.ToString(),
                 Text = d.Name
@@ -138,48 +147,59 @@ public class EmployeeController : BaseController
         return View(viewModel);
     }
 
-
-
-
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> EditAsync(Guid id, UpdateEmployeeViewModel model)
+    public async Task<IActionResult> EditAsync(Guid id, UpdateEmployeeViewModel model)
     {
         if (id != model.Id)
         {
             return BadRequest();
         }
 
-    
-
-        try
+        if (!ModelState.IsValid)
         {
-            var viewModel = new UpdateEmployeeDto
+            var departmentsDto = await _departmentService.GetAllDepartmentsAsync();
+            model.Departments = departmentsDto.Departments.Select(d => new SelectListItem
             {
-                Salary = model.Salary,
-                Email = model.Email,
-                DepartmentId = model.DepartmentId,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                HireDate = model.HireDate,
-                Id = model.Id
-            };
-            var updatedEmployee = await _employeeService.UpdateEmployeeAsync(viewModel);
+                Value = d.Id.ToString(),
+                Text = d.Name
+            }).ToList();
+            try
+            {
+                var updateDto = new UpdateEmployeeDto
+                {
+                    Id = model.Id,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    HireDate = model.HireDate,
+                    Salary = model.Salary,
+                    DepartmentId = model.DepartmentId,
+                    Photo = model.Photo,
+                    ImageUrl = model.ImageUrl
+                };
 
-            if (updatedEmployee == null)
-            {
-                return NotFound();
+                var updatedEmployee = await _employeeService.UpdateEmployeeAsync(updateDto);
+
+                if (updatedEmployee == null)
+                {
+                    return NotFound();
+                }
+
+                _notyf.Success("Employee updated successfully");
+                return RedirectToAction(nameof(Index));
             }
-            _notyf.Success("Employee edited successfully");
-            return RedirectToAction(nameof(Index));
+            catch (Exception)
+            {
+                ModelState.AddModelError("", "An error occurred while updating the employee.");
+                return View(model);
+            }
         }
-        catch (Exception ex)
-        {
-            ModelState.AddModelError("", "An error occurred while updating the department.");
 
-            return View(model);
-        }
+        return View(model);
+        
     }
+
 
 
     public async Task<IActionResult> Delete(Guid id)
@@ -190,6 +210,7 @@ public class EmployeeController : BaseController
         {
             return NotFound();
         }
+     
 
         var viewModel = new EmployeeViewModel
         {
@@ -199,14 +220,16 @@ public class EmployeeController : BaseController
             Email = employeeDto.Email,
             Salary = employeeDto.Salary
         };
-
         return View(viewModel);
     }
+
 
     [HttpPost("Employee/Delete")]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
         await _employeeService.DeleteEmployeeAsync(id);
+        _notyf.Success("Employee Deleted successfully");
         return RedirectToAction(nameof(Index));
     }
+
 }

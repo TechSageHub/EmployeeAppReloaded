@@ -11,6 +11,7 @@ namespace Presentation.Models
         public decimal Salary { get; set; }
         public Guid DepartmentId { get; set; }
         public List<SelectListItem> Departments { get; set; }
+        public IFormFile? Photo { get; set; }
     } 
     public class EmployeeViewModel
     {
@@ -21,9 +22,11 @@ namespace Presentation.Models
         public DateTime HireDate { get; set; }
         public decimal Salary { get; set; }
         public Guid DepartmentId { get; set; }  
-        public string DepartmentName { get; set; } 
+        public string DepartmentName { get; set; }
+        public string? ImageUrl { get; set; }
+
     }
-    
+
     public class UpdateEmployeeViewModel
     {
         public Guid Id { get; set; }
@@ -34,6 +37,9 @@ namespace Presentation.Models
         public decimal Salary { get; set; }
         public Guid DepartmentId { get; set; }
         public List<SelectListItem> Departments { get; set; }
+        public IFormFile? Photo { get; set; }
+        public string? ImageUrl { get; set; }
+
     }
 
     public class EmployeesViewModel

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Models;
@@ -9,6 +10,7 @@ namespace Presentation.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly INotyfService _notyf;
 
         public AccountController
             (
@@ -45,7 +47,7 @@ namespace Presentation.Controllers
 
                 var errorMessages = string.Join("<br>", result.Errors.Select(e => e.Description));
 
-                SetFlashMessage(errorMessages, "error");
+                _notyf(errorMessages, "error");
             }
             return View(model);
         }
@@ -64,10 +66,10 @@ namespace Presentation.Controllers
                 {
                     return RedirectToAction("Index", "Home");
                 }
-                SetFlashMessage("Invalid login attempt!", "error");
+                _notyf("Invalid login attempt!", "error");
                 return View(model);
             }
-            SetFlashMessage("an error occures!", "error");
+            _notyf("an error occures!", "error");
 
             return View(model);
         }

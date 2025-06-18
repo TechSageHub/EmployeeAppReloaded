@@ -10,4 +10,5 @@ public class Employee
     public decimal Salary { get; set; }  
     public Guid DepartmentId { get; set; }
     public Department Department { get; set; } = default!;
+    public string? ImageUrl { get; set; }
 }

@@ -56,7 +56,7 @@ public class DepartmentController : BaseController
     {
         if (!ModelState.IsValid)
         {
-            SetFlashMessage("Please fill in all required fields correctly.", "error");
+            _notyf("Please fill in all required fields correctly.", "error");
             return View(model);
         }
 

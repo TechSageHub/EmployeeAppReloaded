@@ -17,6 +17,7 @@ public static class Mapperly
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             DepartmentName = dto.DepartmentName,
+            ImageUrl = dto.ImageUrl,
         };
     }
     public static EmployeeDto ToDto(this EmployeeViewModel vm)
@@ -28,7 +29,8 @@ public static class Mapperly
             FirstName = vm.FirstName,
             Email = vm.Email,
             HireDate = vm.HireDate,
-            Salary = vm.Salary
+            Salary = vm.Salary,
+              ImageUrl = vm.ImageUrl
         };
     }
     public static EmployeesViewModel ToViewModel(this EmployeesDto dto)

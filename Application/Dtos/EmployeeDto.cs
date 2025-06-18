@@ -1,4 +1,5 @@
 ﻿using Data.Model;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Dtos;
 
@@ -11,7 +12,8 @@ public class EmployeeDto
     public DateTime HireDate { get; set; }
     public decimal Salary { get; set; }
     public Guid DepartmentId { get; set; } = default!;
-    public string DepartmentName { get; set; } 
+    public string DepartmentName { get; set; }
+    public string? ImageUrl { get; set; }
 }
 
 public class  EmployeesDto 
@@ -27,6 +29,7 @@ public class  CreateEmployeeDto
     public DateTime HireDate { get; set; }
     public decimal Salary { get; set; }
     public Guid DepartmentId { get; set; } = default!;
+    public IFormFile? Photo { get; set; }
 }
 public class  UpdateEmployeeDto 
 {
@@ -37,5 +40,7 @@ public class  UpdateEmployeeDto
     public DateTime HireDate { get; set; }
     public decimal Salary { get; set; }
     public Guid DepartmentId { get; set; } = default!;
+    public IFormFile? Photo { get; set; }
+    public string? ImageUrl { get; set; }
 }
 

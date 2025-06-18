@@ -3,6 +3,9 @@ using MySql.EntityFrameworkCore.Extensions;
 using Application;
 using AspNetCoreHero.ToastNotification;
 using Microsoft.AspNetCore.Identity;
+using CloudinaryDotNet;
+using Data.Model;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +20,8 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(
         options.Password.RequireUppercase = false;
         options.Password.RequireNonAlphanumeric = true;
     })
+
+
 
 .AddEntityFrameworkStores<EmployeeAppDbContext>()
 .AddDefaultTokenProviders();
@@ -41,6 +46,16 @@ builder.Services.AddNotyf(config =>
     config.Position = NotyfPosition.TopRight;
 }
 );
+
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+
+builder.Services.AddSingleton(provider =>
+{
+    var config = provider.GetRequiredService<IOptions<CloudinarySettings>>().Value;
+    Account account = new Account(config.CloudName, config.ApiKey, config.ApiSecret);
+    return new Cloudinary(account);
+});
+
 
 var app = builder.Build();
 
