@@ -8,7 +8,7 @@ namespace Application.Services.Department;
 
 public class DepartmentService(EmployeeAppDbContext _context, ILogger<DepartmentService> _logger) : IDepartmentService
 {
-
+    //Hello conflict
     public async Task<DepartmentDto> CreateDepartmentAsync(CreateDepartmentDto dto)
     {
         _logger.LogInformation("Creating a new department with Name: {Name}", dto.Name);
@@ -74,6 +74,30 @@ public class DepartmentService(EmployeeAppDbContext _context, ILogger<Department
     }
 
     public async Task<DepartmentDto> UpdateDepartmentAsync(UpdateDepartmentDto departmentDto)
+    {
+        var department = await _context.Departments.FindAsync(departmentDto.Id);
+
+        if (department == null)
+        {
+            return null;
+        }
+
+        department.Name = departmentDto.Name;
+        department.Description = departmentDto.Description;
+
+        await _context.SaveChangesAsync();
+
+        var updatedDto = new DepartmentDto
+        {
+            Id = department.Id,
+            Name = department.Name,
+            Description = department.Description
+        };
+
+        return updatedDto;
+    }
+
+    public async Task<DepartmentDto> NewUpdateDepartmentAsync(UpdateDepartmentDto departmentDto)
     {
         var department = await _context.Departments.FindAsync(departmentDto.Id);
 
