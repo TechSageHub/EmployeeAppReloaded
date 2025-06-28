@@ -8,7 +8,7 @@ namespace Application.Services.Department;
 
 public class DepartmentService(EmployeeAppDbContext _context, ILogger<DepartmentService> _logger) : IDepartmentService
 {
-
+    //test conflict
     public async Task<DepartmentDto> CreateDepartmentAsync(CreateDepartmentDto dto)
     {
         _logger.LogInformation("Creating a new department with Name: {Name}", dto.Name);
