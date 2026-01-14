@@ -10,6 +10,7 @@ using Data.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using MySql.EntityFrameworkCore.Extensions;
+using Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,5 +92,11 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await SeedData.Initialize(services);
+}
 
 app.Run();

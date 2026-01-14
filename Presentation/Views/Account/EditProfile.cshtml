@@ -1,0 +1,105 @@
+@model Presentation.Models.EditProfileViewModel
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-primary py-3">
+                <h4 class="card-title text-white mb-0"><i class="bi bi-person-gear me-2"></i>Edit My Profile</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="EditProfile" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+                    <input type="hidden" asp-for="EmployeeId" />
+                    <input type="hidden" asp-for="ImageUrl" />
+
+                    <div class="text-center mb-4">
+                        <div class="position-relative d-inline-block">
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <img src="@Model.ImageUrl" id="profileImagePreview" class="rounded-circle shadow" style="width: 120px; height: 120px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div id="profileImagePreviewPlaceholder" class="rounded-circle bg-light d-flex align-items-center justify-content-center shadow" style="width: 120px; height: 120px;">
+                                    <i class="bi bi-person text-secondary fs-1"></i>
+                                </div>
+                            }
+                            <label for="Photo" class="btn btn-sm btn-primary position-absolute bottom-0 end-0 rounded-circle p-2" title="Change Photo">
+                                <i class="bi bi-camera"></i>
+                            </label>
+                            <input asp-for="Photo" type="file" class="d-none" onchange="previewImage(this)" />
+                        </div>
+                        <div class="mt-2 small text-muted">Upload a profile picture</div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FirstName" class="form-label fw-medium"></label>
+                            <input asp-for="FirstName" class="form-control" placeholder="Enter first name" />
+                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="LastName" class="form-label fw-medium"></label>
+                            <input asp-for="LastName" class="form-control" placeholder="Enter last name" />
+                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="Email" class="form-label fw-medium"></label>
+                            <input asp-for="Email" class="form-control" readonly />
+                            <div class="form-text">Login email cannot be changed here.</div>
+                        </div>
+                        <div class="col-md-12 mb-4">
+                            <label asp-for="PhoneNumber" class="form-label fw-medium"></label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill">
+                            <i class="bi bi-check-circle me-2"></i>Save Changes
+                        </button>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-light px-4 rounded-pill">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var preview = document.getElementById('profileImagePreview');
+                    var placeholder = document.getElementById('profileImagePreviewPlaceholder');
+                    
+                    if (preview) {
+                        preview.src = e.target.result;
+                    } else if (placeholder) {
+                        // Create preview if it doesn't exist
+                        var img = document.createElement('img');
+                        img.id = 'profileImagePreview';
+                        img.src = e.target.result;
+                        img.className = 'rounded-circle shadow';
+                        img.style.width = '120px';
+                        img.style.height = '120px';
+                        img.style.objectFit = 'cover';
+                        placeholder.parentNode.replaceChild(img, placeholder);
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

@@ -34,6 +34,13 @@ public class  CreateEmployeeDto
     public decimal Salary { get; set; }
     public Guid DepartmentId { get; set; } = default!;
     public IFormFile? Photo { get; set; }
+    public string? UserId { get; set; }
+
+    // Address fields
+    public string? Street { get; set; }
+    public string? City { get; set; }
+    public string? State { get; set; }
+    public string? Country { get; set; }
 }
 public class  UpdateEmployeeDto 
 {
@@ -49,5 +56,6 @@ public class  UpdateEmployeeDto
     public string? Street { get; set; }
     public string? City { get; set; }
     public string? State { get; set; }
+    public string? Country { get; set; }
 }
 

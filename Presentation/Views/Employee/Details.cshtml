@@ -1,90 +1,143 @@
 ﻿@model Presentation.Models.EmployeeViewModel
 
 @{
-    ViewData["Title"] = "Employee Details";
+    ViewData["Title"] = "Employee Profile";
 }
 
-<h2>@ViewData["Title"]</h2>
-<hr />
-
-<dl class="row">
-    <dt class="col-sm-3">Photo</dt>
-    <dd class="col-sm-9">
-        @if (!string.IsNullOrEmpty(Model.ImageUrl))
-        {
-            <img src="@Model.ImageUrl" alt="Employee Photo" width="150" height="150" class="img-thumbnail" />
-        }
-        else
-        {
-            <span>No photo available</span>
-        }
-
-    </dd>
-
-
-    <dt class="col-sm-3">First Name</dt>
-    <dd class="col-sm-9">@Model.FirstName</dd>
-
-    <dt class="col-sm-3">Last Name</dt>
-    <dd class="col-sm-9">@Model.LastName</dd>
-
-    <dt class="col-sm-3">Email</dt>
-    <dd class="col-sm-9">@Model.Email</dd>
-
-    <dt class="col-sm-3">Hire Date</dt>
-    <dd class="col-sm-9">@Model.HireDate.ToShortDateString()</dd>
-
-    <dt class="col-sm-3">Salary</dt>
-    <dd class="col-sm-9">@Model.Salary.ToString("C")</dd>
-</dl>
-
-<hr />
-<h4>Address</h4>
-
-@if (Model.Address == null)
-{
-    <div class="alert alert-warning">This employee has no address on file.</div>
-    <a asp-controller="Address" asp-action="Add" asp-route-employeeId="@Model.Id" class="btn btn-success">
-        Add Address
+<div class="mb-4">
+    <a asp-action="Index" class="text-decoration-none text-muted">
+        <i class="bi bi-arrow-left me-1"></i> Back to Directory
     </a>
-}
-else
-{
-    <dl class="row">
-        <dt class="col-sm-3">Street</dt>
-        <dd class="col-sm-9">@Model.Address.Street</dd>
+</div>
 
-        <dt class="col-sm-3">City</dt>
-        <dd class="col-sm-9">@Model.Address.City</dd>
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm text-center p-4 mb-4">
+            <div class="mb-3">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="Profile" class="rounded-circle shadow-sm border border-4 border-white" style="width: 150px; height: 150px; object-fit: cover;" />
+                }
+                else
+                {
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto text-primary fw-bold shadow-sm" style="width: 150px; height: 150px; font-size: 3rem;">
+                        @Model.FirstName[0]@Model.LastName[0]
+                    </div>
+                }
+            </div>
+            <h3 class="fw-bold mb-1">@Model.FirstName @Model.LastName</h3>
+            <p class="text-muted mb-3">@Model.DepartmentName</p>
+            
+            <div class="d-grid gap-2 d-md-block">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary px-4 rounded-pill">
+                    <i class="bi bi-pencil me-2"></i>Edit
+                </a>
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <form asp-action="DeleteImage" asp-route-employeeId="@Model.Id" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger px-4 rounded-pill">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
 
-        <dt class="col-sm-3">State</dt>
-        <dd class="col-sm-9">@Model.Address.State</dd>
+        <div class="card border-0 shadow-sm p-4">
+            <h5 class="fw-bold mb-3">Contact Information</h5>
+            <div class="d-flex align-items-center mb-3">
+                <div class="bg-light p-2 rounded-circle text-primary me-3">
+                    <i class="bi bi-envelope"></i>
+                </div>
+                <div>
+                    <div class="small text-muted">Email</div>
+                    <div class="fw-medium">@Model.Email</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center mb-3">
+                <div class="bg-light p-2 rounded-circle text-primary me-3">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+                <div>
+                    <div class="small text-muted">Hire Date</div>
+                    <div class="fw-medium">@Model.HireDate.ToString("MMMM dd, yyyy")</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="bg-light p-2 rounded-circle text-primary me-3">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+                <div>
+                    <div class="small text-muted">Annual Salary</div>
+                    <div class="fw-medium">@Model.Salary.ToString("C")</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <dt class="col-sm-3">Country</dt>
-        <dd class="col-sm-9">@Model.Address.Country</dd>
-    </dl>
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0">Address Details</h5>
+                @if (Model.Address == null)
+                {
+                    <a asp-controller="Address" asp-action="Add" asp-route-employeeId="@Model.Id" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                        <i class="bi bi-plus-lg me-1"></i>Add Address
+                    </a>
+                }
+                else
+                {
+                    <div>
+                        <a asp-controller="Address" asp-action="Update" asp-route-employeeId="@Model.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2">
+                            Update
+                        </a>
+                        <form asp-controller="Address" asp-action="Delete" asp-route-employeeId="@Model.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Delete address?')">Delete</button>
+                        </form>
+                    </div>
+                }
+            </div>
 
-    <a asp-controller="Address" asp-action="Update" asp-route-employeeId="@Model.Id" class="btn btn-primary me-2">
-        Update Address
-    </a>
-    <form asp-controller="Address" asp-action="Delete" asp-route-employeeId="@Model.Id" method="post" class="d-inline">
-        <button type="submit" class="btn btn-danger me-2">Delete Address</button>
-    </form>
+            @if (Model.Address != null)
+            {
+                <div class="row g-4">
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <div class="small text-muted mb-1">Street</div>
+                            <div class="fw-bold">@Model.Address.Street</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <div class="small text-muted mb-1">City</div>
+                            <div class="fw-bold">@Model.Address.City</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <div class="small text-muted mb-1">State</div>
+                            <div class="fw-bold">@Model.Address.State</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <div class="small text-muted mb-1">Country</div>
+                            <div class="fw-bold">@Model.Address.Country</div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 bg-light rounded-3">
+                    <i class="bi bi-geo-alt text-muted fs-1"></i>
+                    <p class="mt-3">No address records found for this employee.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
 
-}
-@if (!string.IsNullOrEmpty(Model.ImageUrl))
-{
-    <form asp-controller="Employee" asp-action="DeleteImage" asp-route-employeeId="@Model.Id" method="post" class="d-inline">
-        <button type="submit" class="btn btn-danger me-2">Delete Image</button>
-    </form>
-}
-
-
-<hr />
-<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
-<a asp-action="Index" class="btn btn-secondary">Back to List</a>
-
-<!-- Hidden form to store the anti-forgery token -->
 <form id="antiforgeryForm">
     @Html.AntiForgeryToken()
 </form>

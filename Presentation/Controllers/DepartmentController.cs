@@ -36,22 +36,19 @@ public class DepartmentController : BaseController
             return NotFound();
         }
 
-        var viewModel = new DepartmentViewModel
-        {
-            Id = departmentDto.Id,
-            Name = departmentDto.Name,
-            Description = departmentDto.Description
-        };
+        var viewModel = departmentDto.ToViewModel();
 
         return View(viewModel);
     }
 
+    [Authorize(Roles = "Admin")]
     public ActionResult Create()
     {
         return View(); 
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateDepartmentViewModel model)
     {
@@ -79,6 +76,7 @@ public class DepartmentController : BaseController
         return RedirectToAction(nameof(Index));
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> EditAsync(Guid id)
     {
         var departmentDto = await _departmentService.GetDepartmentByIdAsync(id);
@@ -100,6 +98,7 @@ public class DepartmentController : BaseController
 
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> EditAsync(Guid id, UpdateDepartmentViewModel model)
     {
@@ -139,6 +138,7 @@ public class DepartmentController : BaseController
     }
 
      
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var departmentDto = await _departmentService.GetDepartmentByIdAsync(id);
@@ -148,20 +148,29 @@ public class DepartmentController : BaseController
             return NotFound();
         }
 
-        var viewModel = new DepartmentViewModel
-        {
-            Id = departmentDto.Id,
-            Name = departmentDto.Name,
-            Description = departmentDto.Description
-        };
+        var viewModel = departmentDto.ToViewModel();
 
         return View(viewModel);
     }
 
     [HttpPost("Department/Delete")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        await _departmentService.DeleteDepartmentAsync(id);
+        try
+        {
+            await _departmentService.DeleteDepartmentAsync(id);
+            _notyf.Success("Department deleted successfully");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _notyf.Warning(ex.Message);
+        }
+        catch (Exception)
+        {
+            _notyf.Error("An error occurred while deleting the department.");
+        }
+        
         return RedirectToAction(nameof(Index));
     }
 }

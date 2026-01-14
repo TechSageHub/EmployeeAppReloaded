@@ -1,4 +1,5 @@
-﻿using Application.ContractMapping;
+﻿using System.Security.Claims;
+using Application.ContractMapping;
 using Application.Dtos;
 using Application.Services.UploadImage;
 using CloudinaryDotNet;
@@ -7,6 +8,8 @@ using Data.Context;
 using Data.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Application.Services.Email;
 
 namespace Application.Services.Employee;
 
@@ -15,12 +18,18 @@ public class EmployeeService : IEmployeeService
     private readonly EmployeeAppDbContext _context;
     private readonly Cloudinary _cloudinary;
     private readonly IImageService _ImageService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly IEmailService _emailService;
 
-    public EmployeeService(EmployeeAppDbContext context, Cloudinary cloudinary, IImageService ImageService)
+    public EmployeeService(EmployeeAppDbContext context, Cloudinary cloudinary, IImageService ImageService, IHttpContextAccessor httpContextAccessor, UserManager<IdentityUser> userManager, IEmailService emailService)
     {
         _context = context;
         _cloudinary = cloudinary;
         _ImageService = ImageService;
+        _httpContextAccessor = httpContextAccessor;
+        _userManager = userManager;
+        _emailService = emailService;
     }
 
     public async Task<EmployeeDto?> CreateEmployeeAsync(CreateEmployeeDto dto)
@@ -34,6 +43,7 @@ public class EmployeeService : IEmployeeService
             }
 
             var employee = dto.ToModel();
+            employee.UserId = dto.UserId;
 
             if (dto.Photo != null && dto.Photo.Length > 0)
             {
@@ -41,8 +51,67 @@ public class EmployeeService : IEmployeeService
                 employee.ImageUrl = imageUrl;
             }
 
+            // Add address if provided
+            if (!string.IsNullOrWhiteSpace(dto.Street) ||
+                !string.IsNullOrWhiteSpace(dto.City) ||
+                !string.IsNullOrWhiteSpace(dto.State))
+            {
+                employee.Address = new EmployeeAddress
+                {
+                    Street = dto.Street,
+                    City = dto.City,
+                    State = dto.State,
+                    Country = dto.Country ?? "Nigeria",
+                    EmployeeId = employee.Id
+                };
+            }
+
             await _context.Employees.AddAsync(employee);
             await _context.SaveChangesAsync();
+
+            // Create Identity User for the employee
+            var tempPassword = "StaffHub@2026";
+            var user = new IdentityUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                EmailConfirmed = true
+            };
+
+            var createUserResult = await _userManager.CreateAsync(user, tempPassword);
+            if (createUserResult.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, "User");
+                
+                // Update employee with the new UserId
+                employee.UserId = user.Id;
+                _context.Employees.Update(employee);
+                await _context.SaveChangesAsync();
+
+                // Send Onboarding Email
+                var subject = "Welcome to StaffHub - Your Account Details";
+                var body = $@"
+                    <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;'>
+                        <h2 style='color: #0d6efd;'>Welcome to the Team, {dto.FirstName}!</h2>
+                        <p>Hi {dto.FirstName},</p>
+                        <p>Your employee account has been successfully created in the <strong>StaffHub</strong> portal. You can now log in to manage your profile and view your employment details.</p>
+                        
+                        <div style='background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;'>
+                            <h4 style='margin-top: 0;'>Your Login Credentials:</h4>
+                            <p style='margin-bottom: 5px;'><strong>Email/Username:</strong> {dto.Email}</p>
+                            <p style='margin-bottom: 0;'><strong>Password:</strong> {tempPassword}</p>
+                        </div>
+
+                        <p>For security reasons, we recommend that you change your password after your first login.</p>
+                        
+                        <a href='#' style='display: inline-block; background-color: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 10px;'>Go to Portal</a>
+
+                        <hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>
+                        <p style='font-size: 12px; color: #777;'>Sent from StaffHub Employee Management System.</p>
+                    </div>";
+
+                await _emailService.SendEmailAsync(dto.Email, subject, body);
+            }
 
             return employee.ToDto();
         }
@@ -82,20 +151,34 @@ public class EmployeeService : IEmployeeService
     }
 
 
-    public async Task<EmployeesDto> GetAllEmployeesAsync()
+    public async Task<EmployeesDto> GetAllEmployeesAsync(string? userId = null)
     {
-        var employees = await _context.Employees
-            .Include(e => e.Department)
-            .ToListAsync();
+        var query = _context.Employees.Include(e => e.Department).AsQueryable();
+        var user = _httpContextAccessor.HttpContext?.User;
+        var isAdmin = user?.IsInRole("Admin") ?? false;
+
+        if (!isAdmin && !string.IsNullOrEmpty(userId))
+        {
+            query = query.Where(e => e.UserId == userId);
+        }
+
+        var employees = await query.ToListAsync();
 
         return employees.EmployeesDto();
     }
 
-    public async Task<EmployeeDto> GetEmployeeByIdAsync(Guid employeeId)
+    public async Task<EmployeeDto> GetEmployeeByIdAsync(Guid employeeId, string? userId = null)
     {
-        var employee = await _context.Employees
-            .Include(e => e.Address)
-            .FirstOrDefaultAsync(d => d.Id == employeeId);
+        var query = _context.Employees.Include(e => e.Address).AsQueryable();
+        var user = _httpContextAccessor.HttpContext?.User;
+        var isAdmin = user?.IsInRole("Admin") ?? false;
+
+        if (!isAdmin && !string.IsNullOrEmpty(userId))
+        {
+            query = query.Where(e => e.UserId == userId);
+        }
+
+        var employee = await query.FirstOrDefaultAsync(d => d.Id == employeeId);
 
         if (employee == null)
             return null;
@@ -150,6 +233,7 @@ public class EmployeeService : IEmployeeService
                     Street = employeeDto.Street,
                     City = employeeDto.City,
                     State = employeeDto.State,
+                    Country = "Nigeria", // Default for now
                     EmployeeId = employee.Id
                 };
             }
@@ -158,6 +242,10 @@ public class EmployeeService : IEmployeeService
                 employee.Address.Street = employeeDto.Street;
                 employee.Address.City = employeeDto.City;
                 employee.Address.State = employeeDto.State;
+                if (!string.IsNullOrEmpty(employeeDto.Country))
+                {
+                    employee.Address.Country = employeeDto.Country;
+                }
             }
         }
 

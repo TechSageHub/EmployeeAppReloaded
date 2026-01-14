@@ -1,30 +1,44 @@
 ﻿@model UpdateDepartmentViewModel
 
 @{
-    ViewData["Title"] = "Edit Department";
+    ViewData["Title"] = "Update Department";
 }
 
-<h1>@ViewData["Title"]</h1>
-<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white p-4">
+                <h4 class="mb-0 fw-bold">@ViewData["Title"]</h4>
+                <p class="mb-0 small opacity-75">Modify details for @Model.Name</p>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" /> 
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-medium">Department Name</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
 
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+                    <div class="mb-4">
+                        <label asp-for="Description" class="form-label fw-medium"></label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill">
+                            <i class="bi bi-save me-2"></i>Save Changes
+                        </button>
+                        <a asp-action="Index" class="btn btn-light px-4 rounded-pill">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Update Department</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -5,8 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Presentation.Models;
 using System.Text;
-using Application.Dtos;
 using Application.Services.Authentication;
+using Application.Services.Employee;
+using Application.Services.UploadImage;
+using System.Security.Claims;
+#pragma warning disable CS0105 // The using directive for 'Application.Dtos' appeared previously in this namespace
+using Application.Dtos; 
+#pragma warning restore CS0105
 
 namespace Presentation.Controllers
 {
@@ -16,18 +21,24 @@ namespace Presentation.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly INotyfService _notyf;
+        private readonly IEmployeeService _employeeService;
+        private readonly IImageService _imageService;
 
         public AccountController
             (
             IAuthenticationService authService,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            INotyfService notyf)
+            INotyfService notyf,
+            IEmployeeService employeeService,
+            IImageService imageService)
         {
             _authService = authService;
             _userManager = userManager;
             _signInManager = signInManager;
             _notyf = notyf;
+            _employeeService = employeeService;
+            _imageService = imageService;
         }
         [HttpGet]
         public IActionResult ConfirmPrompt(string email)
@@ -221,6 +232,103 @@ namespace Presentation.Controllers
 
             _notyf.Error("Password reset failed.");
             return View(model);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> EditProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var employees = await _employeeService.GetAllEmployeesAsync(userId);
+            var employee = employees.Employees.FirstOrDefault();
+
+            var model = new EditProfileViewModel
+            {
+                Email = User.Identity?.Name ?? ""
+            };
+
+            if (employee != null)
+            {
+                model.EmployeeId = employee.Id;
+                model.FirstName = employee.FirstName;
+                model.LastName = employee.LastName;
+                model.Email = employee.Email;
+                model.ImageUrl = employee.ImageUrl;
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(EditProfileViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? imageUrl = model.ImageUrl;
+
+            if (model.Photo != null && model.Photo.Length > 0)
+            {
+                imageUrl = await _imageService.UploadImageAsync(model.Photo);
+            }
+
+            if (model.EmployeeId.HasValue)
+            {
+                // Update existing employee record
+                var dto = new UpdateEmployeeDto
+                {
+                    Id = model.EmployeeId.Value,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    ImageUrl = imageUrl,
+                    // Preserve other fields if possible, or handle in service
+                };
+                
+                // Get current to preserve fields like DepartmentId
+                var current = await _employeeService.GetEmployeeByIdAsync(model.EmployeeId.Value, userId);
+                if (current != null)
+                {
+                    dto.DepartmentId = current.DepartmentId;
+                    dto.HireDate = current.HireDate;
+                    dto.Salary = current.Salary;
+                    dto.Street = current.Street;
+                    dto.City = current.City;
+                    dto.State = current.State;
+                    // dto.Country = current.Country; // UpdateEmployeeDto fix applied earlier
+                }
+
+                await _employeeService.UpdateEmployeeAsync(dto);
+            }
+            else
+            {
+                // Create profile record for the user (e.g. for Admin)
+                var dto = new CreateEmployeeDto
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    UserId = userId,
+                    // Admins might not have a department, or we use a default
+                    DepartmentId = Guid.Empty, 
+                    HireDate = DateTime.Now,
+                    Salary = 0
+                };
+                
+                // Set ImageUrl directly since CreateEmployeeDto takes Photo IFormFile
+                // We already uploaded it if redirected here, but CreateEmployeeAsync handles upload from Photo
+                dto.Photo = model.Photo; 
+
+                await _employeeService.CreateEmployeeAsync(dto);
+            }
+
+            _notyf.Success("Profile updated successfully");
+            return RedirectToAction("Index", "Home");
         }
     }
 }

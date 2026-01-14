@@ -1,41 +1,70 @@
 ﻿@model Presentation.Models.CreateAddressViewModel
 @{
-    ViewData["Title"] = "Create Address";
+    ViewData["Title"] = "Add Employee Address";
 }
 
-<h1>@ViewData["Title"]</h1>
-<hr />
+<div class="mb-4">
+    <a asp-controller="Employee" asp-action="Details" asp-route-id="@Model.EmployeeId" class="text-decoration-none text-muted">
+        <i class="bi bi-arrow-left me-1"></i> Back to Employee Details
+    </a>
+</div>
 
-<form asp-action="Add" method="post">
-    <input type="hidden" asp-for="EmployeeId" />
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-success text-white p-4">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-geo-alt-fill fs-3 me-3"></i>
+                    <div>
+                        <h4 class="mb-0 fw-bold">@ViewData["Title"]</h4>
+                        <p class="mb-0 small opacity-75">Provide physical location details for the staff member</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Add" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="EmployeeId" />
 
-    <div class="mb-3">
-        <label asp-for="Street" class="form-label"></label>
-        <input asp-for="Street" class="form-control" />
-        <span asp-validation-for="Street" class="text-danger"></span>
+                    <div class="mb-3">
+                        <label asp-for="Street" class="form-label fw-medium"></label>
+                        <input asp-for="Street" class="form-control shadow-none" placeholder="e.g. 123 Business Way" />
+                        <span asp-validation-for="Street" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="City" class="form-label fw-medium"></label>
+                            <input asp-for="City" class="form-control shadow-none" placeholder="e.g. Ikeja" />
+                            <span asp-validation-for="City" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="State" class="form-label fw-medium"></label>
+                            <select asp-for="State" class="form-select shadow-none" asp-items="ViewBag.States">
+                                <option value="">-- Select State --</option>
+                            </select>
+                            <span asp-validation-for="State" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Country" class="form-label fw-medium"></label>
+                        <input asp-for="Country" class="form-control shadow-none" placeholder="e.g. Nigeria" />
+                        <span asp-validation-for="Country" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success px-4 rounded-pill">
+                            <i class="bi bi-check-circle me-2"></i>Save Address
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="mb-3">
-        <label asp-for="City" class="form-label"></label>
-        <input asp-for="City" class="form-control" />
-        <span asp-validation-for="City" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Country" class="form-label"></label>
-        <input asp-for="Country" class="form-control" />
-        <span asp-validation-for="City" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="State" class="form-label"></label>
-        <select asp-for="State" class="form-select" asp-items="ViewBag.States">
-            <option value="">-- Select State --</option>
-        </select>
-        <span asp-validation-for="State" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Add Address</button>
-</form>
-
-<a asp-controller="Employee" asp-action="Details" asp-route-id="@Model.EmployeeId" class="btn btn-secondary mt-3">Back to Employee Details</a>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

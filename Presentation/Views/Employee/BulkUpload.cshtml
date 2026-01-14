@@ -1,0 +1,57 @@
+@model Presentation.Models.BulkUploadViewModel
+@{
+    ViewData["Title"] = "Bulk Upload Employees";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-primary py-3 d-flex align-items-center justify-content-between">
+                <h4 class="card-title text-white mb-0"><i class="bi bi-file-earmark-arrow-up me-2"></i>Bulk Upload Employees</h4>
+                <a asp-action="Index" class="btn btn-sm btn-light rounded-pill"><i class="bi bi-arrow-left me-1"></i>Back to List</a>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info border-0 shadow-sm mb-4">
+                    <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Instructions</h5>
+                    <p class="mb-0">Please upload a <strong>CSV file</strong> containing employee details in the following order:</p>
+                    <code class="d-block bg-white p-2 rounded mt-2 small">
+                        FirstName, LastName, Email, Salary, DepartmentName, Street, City, State, Country
+                    </code>
+                </div>
+
+                <form asp-action="BulkUpload" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="File" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <input asp-for="File" type="file" class="form-control" accept=".csv" />
+                            <label class="input-group-text bg-light" for="File"><i class="bi bi-filetype-csv"></i></label>
+                        </div>
+                        <span asp-validation-for="File" class="text-danger small"></span>
+                        <div class="form-text mt-2">Maximum file size: 5MB. Only .csv files are allowed.</div>
+                    </div>
+
+                    <div class="bg-light p-3 rounded-3 mb-4">
+                        <p class="mb-1 fw-medium">CSV Template Example:</p>
+                        <pre class="bg-white p-2 rounded small mb-0">John,Doe,john@example.com,5000,IT,123 Main St,Lagos,Lagos,Nigeria</pre>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary py-2 rounded-pill fw-bold">
+                            <i class="bi bi-cloud-upload me-2"></i>Start Bulk Upload
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <p class="text-muted small">Need help with the format? <a href="#" class="text-decoration-none">Download CSV Template</a></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

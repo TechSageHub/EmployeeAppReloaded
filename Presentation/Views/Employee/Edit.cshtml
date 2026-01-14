@@ -1,151 +1,114 @@
-﻿@* @model Presentation.Models.UpdateEmployeeViewModel
+﻿@model Presentation.Models.UpdateEmployeeViewModel
 
 @{
-    ViewData["Title"] = "Edit Employee";
+    ViewData["Title"] = "Update Employee Info";
 }
 
-<h2>@ViewData["Title"]</h2>
-<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white p-4">
+                <h4 class="mb-0 fw-bold">@ViewData["Title"]</h4>
+                <p class="mb-0 small opacity-75">Modify details for @Model.FirstName @Model.LastName</p>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="ImageUrl" />
 
-<form asp-action="Edit" method="post" enctype="multipart/form-data">
-    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FirstName" class="form-label fw-medium"></label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        </div>
 
-    <input type="hidden" asp-for="Id" />
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="LastName" class="form-label fw-medium"></label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        </div>
 
-    <div class="mb-3">
-        <label asp-for="FirstName" class="form-label"></label>
-        <input asp-for="FirstName" class="form-control" />
-        <span asp-validation-for="FirstName" class="text-danger"></span>
-    </div>
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="Email" class="form-label fw-medium"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
 
-    <div class="mb-3">
-        <label asp-for="LastName" class="form-label"></label>
-        <input asp-for="LastName" class="form-control" />
-        <span asp-validation-for="LastName" class="text-danger"></span>
-    </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="HireDate" class="form-label fw-medium"></label>
+                            <input asp-for="HireDate" class="form-control" type="date" value="@Model.HireDate.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="HireDate" class="text-danger small"></span>
+                        </div>
 
-    <div class="mb-3">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Salary" class="form-label fw-medium"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Salary" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Salary" class="text-danger small"></span>
+                        </div>
 
-    <div class="mb-3">
-        <label asp-for="HireDate" class="form-label"></label>
-        <input asp-for="HireDate" class="form-control" type="date" />
-        <span asp-validation-for="HireDate" class="text-danger"></span>
-    </div>
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="DepartmentId" class="form-label fw-medium">Department</label>
+                            <select asp-for="DepartmentId" class="form-select" asp-items="Model.Departments"></select>
+                            <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+                        </div>
 
-    <div class="mb-3">
-        <label asp-for="Salary" class="form-label"></label>
-        <input asp-for="Salary" class="form-control" />
-        <span asp-validation-for="Salary" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="DepartmentId" class="form-label">Department</label>
-        <select asp-for="DepartmentId" class="form-control" asp-items="Model.Departments"></select>
-        <span asp-validation-for="DepartmentId" class="text-danger"></span>
-    </div>
+                        <div class="col-md-12 mb-4">
+                            <label asp-for="Photo" class="form-label fw-medium">Change Profile Picture</label>
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                {
+                                    <img src="@Model.ImageUrl" class="rounded shadow-sm" style="width: 60px; height: 60px; object-fit: cover;" />
+                                }
+                                <input asp-for="Photo" type="file" class="form-control" />
+                            </div>
+                            <div class="form-text">Optional: JPG, PNG or GIF (Max 2MB)</div>
+                            <span asp-validation-for="Photo" class="text-danger small"></span>
+                        </div>
 
-    <div class="mb-3">
-        <label asp-for="Photo" class="form-label"></label>
-        <input asp-for="Photo" type="file" class="form-control" />
-        <span asp-validation-for="Photo" class="text-danger"></span>
-    </div>
+                        <div class="col-md-12">
+                            <hr class="my-4">
+                            <h5 class="fw-bold mb-3 text-secondary"><i class="bi bi-geo-alt me-2"></i>Address Details</h5>
+                        </div>
 
-    @if (!string.IsNullOrEmpty(Model.ImageUrl))
-    {
-        <div class="mb-3">
-            <label>Current Photo:</label><br />
-            <img src="@Model.ImageUrl" alt="Employee Photo" width="150" class="img-thumbnail" />
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="Street" class="form-label fw-medium"></label>
+                            <input asp-for="Street" class="form-control" placeholder="Street Address" />
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="City" class="form-label fw-medium"></label>
+                            <input asp-for="City" class="form-control" placeholder="City" />
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="State" class="form-label fw-medium"></label>
+                            <select asp-for="State" class="form-select" asp-items="Model.States">
+                                <option value="">-- Select State --</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Country" class="form-label fw-medium"></label>
+                            <input asp-for="Country" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 mt-2">
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill">
+                            <i class="bi bi-save me-2"></i>Save Changes
+                        </button>
+                        <a asp-action="Index" class="btn btn-light px-4 rounded-pill">Cancel</a>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <!-- Hidden input to preserve current image -->
-        <input type="hidden" asp-for="ImageUrl" />
-    }
-
-    <button type="submit" class="btn btn-primary">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-} *@
-
-
-@model Presentation.Models.UpdateEmployeeViewModel
-
-@{
-    ViewData["Title"] = "Edit Employee";
-}
-
-<h2>@ViewData["Title"]</h2>
-<hr />
-
-<!-- Validation Summary -->
-@Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
-<form asp-action="Edit" method="post" enctype="multipart/form-data">
-    @Html.AntiForgeryToken()
-
-    <input type="hidden" asp-for="Id" />
-
-    <div class="mb-3">
-        <label asp-for="FirstName" class="form-label"></label>
-        <input asp-for="FirstName" class="form-control" />
-        <span asp-validation-for="FirstName" class="text-danger"></span>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="LastName" class="form-label"></label>
-        <input asp-for="LastName" class="form-control" />
-        <span asp-validation-for="LastName" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="HireDate" class="form-label"></label>
-        <input asp-for="HireDate" class="form-control" type="date" />
-        <span asp-validation-for="HireDate" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Salary" class="form-label"></label>
-        <input asp-for="Salary" class="form-control" />
-        <span asp-validation-for="Salary" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="DepartmentId" class="form-label">Department</label>
-        <select asp-for="DepartmentId" class="form-control" asp-items="Model.Departments"></select>
-        <span asp-validation-for="DepartmentId" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Photo" class="form-label">Upload Photo</label>
-        <input asp-for="Photo" type="file" class="form-control" />
-        <span asp-validation-for="Photo" class="text-danger"></span>
-    </div>
-
-    @if (!string.IsNullOrEmpty(Model.ImageUrl))
-    {
-        <div class="mb-3">
-            <label>Current Photo:</label><br />
-            <img src="@Model.ImageUrl" alt="Employee Photo" width="150" class="img-thumbnail" />
-        </div>
-    }
-
-    <!-- Hidden field so we don't lose ImageUrl when no new file is uploaded -->
-    <input type="hidden" asp-for="ImageUrl" />
-
-    <button type="submit" class="btn btn-primary">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -133,7 +133,8 @@ public static class Mapper
         {
             Id = department.Id,
             Name = department.Name,
-            Description = department.Description
+            Description = department.Description,
+            Employees = department.Employees?.Select(e => e.ToDto()).ToList() ?? []
         };
     }
 
@@ -150,6 +151,7 @@ public static class Mapper
             LastName = employee.LastName,
             DepartmentId = employee.DepartmentId,
             ImageUrl = employee.ImageUrl,
+            Address = employee.Address?.ToDto()
         };
     }
 
@@ -237,19 +239,17 @@ public static class Mapper
 
     public static DepartmentsDto DepartmentsDto(this List<Department> departments)
     {
-        if (departments == null || !departments.Any()) return null!;
         return new DepartmentsDto
         {
-            Departments = departments.Select(d => d.ToDto()).ToList()
+            Departments = departments?.Select(d => d.ToDto()).ToList() ?? new List<DepartmentDto>()
         };
     }
 
     public static EmployeesDto EmployeesDto(this List<Employee> employees)
     {
-        if (employees == null || !employees.Any()) return null!;
         return new EmployeesDto
         {
-            Employees = employees.Select(d => d.ToDto()).ToList()
+            Employees = employees?.Select(d => d.ToDto()).ToList() ?? new List<EmployeeDto>()
         };
     }
 }

@@ -1,12 +1,14 @@
 ﻿using Application.Dtos;
 using Application.Services.Department;
 using Application.Services.Employee;
+using Application.Services.Address;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Presentation.DtoMapping;
 using Presentation.Models;
+using System.Security.Claims;
 
 namespace Presentation.Controllers;
 
@@ -16,26 +18,30 @@ public class EmployeeController : BaseController
     private readonly IEmployeeService _employeeService;
     private readonly IDepartmentService _departmentService;
     private readonly INotyfService _notyf;
+    private readonly IAddressService _addressService;
 
-    public EmployeeController(IEmployeeService employeeService, INotyfService notyf, IDepartmentService departmentService)
+    public EmployeeController(IEmployeeService employeeService, INotyfService notyf, IDepartmentService departmentService, IAddressService addressService)
     {
         _employeeService = employeeService;
         _departmentService = departmentService;
         _notyf = notyf;
+        _addressService = addressService;
     }
 
     
 
     public async Task<IActionResult> Index()
     {
-        var employees = await _employeeService.GetAllEmployeesAsync();
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var employees = await _employeeService.GetAllEmployeesAsync(userId);
         var viewModel = employees.ToViewModel();
         return View(viewModel);
     }
 
     public async Task<IActionResult> Details(Guid id)
     {
-        var employeeDto = await _employeeService.GetEmployeeByIdAsync(id);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var employeeDto = await _employeeService.GetEmployeeByIdAsync(id, userId);
         if (employeeDto == null)
             return NotFound();
 
@@ -65,17 +71,8 @@ public class EmployeeController : BaseController
 
     public async Task<IActionResult> Create()
     {
-        var departmentsDto = await _departmentService.GetAllDepartmentsAsync();
-
-        var model = new CreateEmployeeViewModel
-        {
-            Departments = departmentsDto.Departments.Select(d => new SelectListItem
-            {
-                Value = d.Id.ToString(),
-                Text = d.Name
-            }).ToList()
-        };
-
+        var model = new CreateEmployeeViewModel();
+        await PopulateCreateData(model);
         return View(model);
     }
 
@@ -91,14 +88,19 @@ public class EmployeeController : BaseController
             Salary = model.Salary,
             Email = model.Email,
             HireDate = model.HireDate,
-            Photo = model.Photo
+            Photo = model.Photo,
+            UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+            Street = model.Street,
+            City = model.City,
+            State = model.State,
+            Country = model.Country
         };
 
         var result = await _employeeService.CreateEmployeeAsync(dto);
 
         if (result == null)
         {
-            await PopulateDepartments(model);
+            await PopulateCreateData(model);
             _notyf.Error("Email already exists. Please use a different email.");
             return View(model);
         }
@@ -109,13 +111,12 @@ public class EmployeeController : BaseController
 
     public async Task<IActionResult> EditAsync(Guid id)
     {
-        var employeeDto = await _employeeService.GetEmployeeByIdAsync(id);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var employeeDto = await _employeeService.GetEmployeeByIdAsync(id, userId);
         if (employeeDto == null)
         {
             return NotFound();
         }
-
-        var departmentsDto = await _departmentService.GetAllDepartmentsAsync();
 
         var viewModel = new UpdateEmployeeViewModel
         {
@@ -127,12 +128,13 @@ public class EmployeeController : BaseController
             Salary = employeeDto.Salary,
             DepartmentId = employeeDto.DepartmentId,
             ImageUrl = employeeDto.ImageUrl,
-            Departments = departmentsDto.Departments.Select(d => new SelectListItem
-            {
-                Value = d.Id.ToString(),
-                Text = d.Name
-            }).ToList()
+            Street = employeeDto.Address?.Street,
+            City = employeeDto.Address?.City,
+            State = employeeDto.Address?.State,
+            Country = employeeDto.Address?.Country
         };
+
+        await PopulateUpdateData(viewModel);
 
         return View(viewModel);
     }
@@ -174,7 +176,10 @@ public class EmployeeController : BaseController
                 Salary = model.Salary,
                 DepartmentId = model.DepartmentId,
                 Photo = model.Photo,
-                ImageUrl = model.ImageUrl
+                ImageUrl = model.ImageUrl,
+                Street = model.Street,
+                City = model.City,
+                State = model.State
             };
 
             var updatedEmployee = await _employeeService.UpdateEmployeeAsync(updateDto);
@@ -187,6 +192,7 @@ public class EmployeeController : BaseController
         }
         catch
         {
+            await PopulateUpdateData(model);
             ModelState.AddModelError("", "An error occurred while updating the employee.");
             return View(model);
         }
@@ -195,7 +201,8 @@ public class EmployeeController : BaseController
 
     public async Task<IActionResult> Delete(Guid id)
     {
-        var employeeDto = await _employeeService.GetEmployeeByIdAsync(id);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var employeeDto = await _employeeService.GetEmployeeByIdAsync(id, userId);
 
         if (employeeDto == null)
         {
@@ -228,7 +235,7 @@ public class EmployeeController : BaseController
         return RedirectToAction("Details", "Employee", new { id = employeeId });
     }
 
-    private async Task PopulateDepartments(CreateEmployeeViewModel model)
+    private async Task PopulateCreateData(CreateEmployeeViewModel model)
     {
         var departmentsDto = await _departmentService.GetAllDepartmentsAsync();
         model.Departments = departmentsDto.Departments.Select(d => new SelectListItem
@@ -236,5 +243,125 @@ public class EmployeeController : BaseController
             Value = d.Id.ToString(),
             Text = d.Name
         }).ToList();
+
+        var states = _addressService.GetAllStates();
+        model.States = states.Select(s => new SelectListItem
+        {
+            Value = s,
+            Text = s
+        }).ToList();
+    }
+
+    private async Task PopulateUpdateData(UpdateEmployeeViewModel model)
+    {
+        var departmentsDto = await _departmentService.GetAllDepartmentsAsync();
+        model.Departments = departmentsDto.Departments.Select(d => new SelectListItem
+        {
+            Value = d.Id.ToString(),
+            Text = d.Name
+        }).ToList();
+
+        var states = _addressService.GetAllStates();
+        model.States = states.Select(s => new SelectListItem
+        {
+            Value = s,
+            Text = s
+        }).ToList();
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
+    public IActionResult BulkUpload()
+    {
+        return View(new BulkUploadViewModel());
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> BulkUpload(BulkUploadViewModel model)
+    {
+        if (!ModelState.IsValid || model.File == null || model.File.Length == 0)
+        {
+            _notyf.Error("Please select a valid CSV file.");
+            return View(model);
+        }
+
+        try
+        {
+            var departments = await _departmentService.GetAllDepartmentsAsync();
+            int successCount = 0;
+            int failCount = 0;
+
+            using (var reader = new StreamReader(model.File.OpenReadStream()))
+            {
+                // Skip header
+                await reader.ReadLineAsync();
+
+                while (!reader.EndOfStream)
+                {
+                    var line = await reader.ReadLineAsync();
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+
+                    var values = line.Split(',');
+                    if (values.Length < 3)
+                    {
+                        failCount++;
+                        continue;
+                    }
+
+                    try
+                    {
+                        // Format: FirstName, LastName, Email, Salary, DepartmentName, Street, City, State, Country
+                        var firstName = values[0].Trim();
+                        var lastName = values[1].Trim();
+                        var email = values[2].Trim();
+                        var salaryStr = values.Length > 3 ? values[3].Trim() : "0";
+                        var salary = decimal.TryParse(salaryStr, out var s) ? s : 0;
+                        var deptName = values.Length > 4 ? values[4].Trim() : "";
+                        
+                        var deptId = departments.Departments
+                            .FirstOrDefault(d => d.Name.Equals(deptName, StringComparison.OrdinalIgnoreCase))?.Id 
+                            ?? departments.Departments.FirstOrDefault()?.Id 
+                            ?? Guid.Empty;
+
+                        var dto = new CreateEmployeeDto
+                        {
+                            FirstName = firstName,
+                            LastName = lastName,
+                            Email = email,
+                            Salary = salary,
+                            DepartmentId = deptId,
+                            HireDate = DateTime.Now,
+                            Street = values.Length > 5 ? values[5].Trim() : null,
+                            City = values.Length > 6 ? values[6].Trim() : null,
+                            State = values.Length > 7 ? values[7].Trim() : null,
+                            Country = values.Length > 8 ? values[8].Trim() : "Nigeria"
+                        };
+
+                        var result = await _employeeService.CreateEmployeeAsync(dto);
+                        if (result != null) successCount++;
+                        else failCount++;
+                    }
+                    catch
+                    {
+                        failCount++;
+                    }
+                }
+            }
+
+            if (successCount > 0) 
+                _notyf.Success($"{successCount} employees uploaded successfully.");
+            
+            if (failCount > 0) 
+                _notyf.Warning($"{failCount} rows failed to upload.");
+
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            _notyf.Error("An error occurred during bulk upload: " + ex.Message);
+            return View(model);
+        }
     }
 }

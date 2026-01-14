@@ -11,5 +11,6 @@ public class Employee
     public Guid DepartmentId { get; set; }
     public Department Department { get; set; } = default!;
     public string? ImageUrl { get; set; }
+    public string? UserId { get; set; }
     public EmployeeAddress? Address { get; set; }
 }

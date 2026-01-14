@@ -5,8 +5,8 @@ namespace Application.Services.Employee
     {
         Task<EmployeeDto> CreateEmployeeAsync(CreateEmployeeDto dto);
         Task DeleteEmployeeAsync(Guid employeeId);
-        Task<EmployeesDto> GetAllEmployeesAsync();
-        Task<EmployeeDto> GetEmployeeByIdAsync(Guid employeeId);
+        Task<EmployeesDto> GetAllEmployeesAsync(string? userId = null);
+        Task<EmployeeDto> GetEmployeeByIdAsync(Guid employeeId, string? userId = null);
         Task<EmployeeDto> UpdateEmployeeAsync(UpdateEmployeeDto employeeDto);
         Task DeleteImageAsync(Guid employeeId);
     }

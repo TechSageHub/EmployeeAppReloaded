@@ -3,10 +3,22 @@
     Layout = "_Layout";
 }
 
-<div class="text-center mt-5">
-    <h2 class="text-success fw-bold">Email Confirmed Successfully!</h2>
-    <p>Your email address has been verified.</p>
-    <p>You can now log in to your account.</p>
-
-    <a asp-action="Login" asp-controller="Account" class="btn btn-primary mt-3">Back to Login</a>
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm mt-5 text-center p-5">
+            <div class="mb-4">
+                <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                    <i class="bi bi-check-circle-fill display-3"></i>
+                </div>
+            </div>
+            <h2 class="fw-bold text-dark mb-3">Email Verified!</h2>
+            <p class="text-muted mb-4 fs-5">Your email address has been successfully verified. You now have full access to your StaffHub account.</p>
+            
+            <div class="d-grid gap-2 col-md-8 mx-auto">
+                <a asp-action="Login" asp-controller="Account" class="btn btn-primary py-2 rounded-pill shadow-sm">
+                    Go to Login <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

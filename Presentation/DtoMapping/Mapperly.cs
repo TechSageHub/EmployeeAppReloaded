@@ -235,7 +235,8 @@ public static class Mapperly
         {
             Id = dto.Id,
             Name = dto.Name,
-            Description = dto.Description
+            Description = dto.Description,
+            EmployeeCount = dto.Employees?.Count ?? 0
         };
     }
 

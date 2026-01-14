@@ -27,8 +27,15 @@ namespace Presentation.Models
         public DateTime HireDate { get; set; } = DateTime.Now;
         public decimal Salary { get; set; }
         public Guid DepartmentId { get; set; }
-        public List<SelectListItem> Departments { get; set; }
+        public List<SelectListItem> Departments { get; set; } = new();
         public IFormFile? Photo { get; set; }
+
+        // Address fields
+        public string? Street { get; set; }
+        public string? City { get; set; }
+        public string? State { get; set; }
+        public string? Country { get; set; } = "Nigeria";
+        public List<SelectListItem> States { get; set; } = new();
     }
    
 
@@ -41,10 +48,16 @@ namespace Presentation.Models
         public DateTime HireDate { get; set; }
         public decimal Salary { get; set; }
         public Guid DepartmentId { get; set; }
-        public List<SelectListItem> Departments { get; set; }
+        public List<SelectListItem> Departments { get; set; } = new();
         public IFormFile? Photo { get; set; }
         public string? ImageUrl { get; set; }
 
+        // Address fields
+        public string? Street { get; set; }
+        public string? City { get; set; }
+        public string? State { get; set; }
+        public string? Country { get; set; }
+        public List<SelectListItem> States { get; set; } = new();
     }
 
     public class EmployeesViewModel

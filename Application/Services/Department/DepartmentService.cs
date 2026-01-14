@@ -37,19 +37,29 @@ public class DepartmentService(EmployeeAppDbContext _context, ILogger<Department
 
     public async Task DeleteDepartmentAsync(Guid departmentId)
     {
-        var department = await _context.Departments.FindAsync(departmentId);
+        var department = await _context.Departments
+            .Include(d => d.Employees)
+            .FirstOrDefaultAsync(d => d.Id == departmentId);
 
         if (department == null)
         {
             throw new KeyNotFoundException("Department not found.");
         }
+
+        if (department.Employees.Any())
+        {
+            throw new InvalidOperationException("Cannot delete a department that has employees assigned to it.");
+        }
+
         _context.Departments.Remove(department);
         await _context.SaveChangesAsync();
     }
 
     public async Task<DepartmentsDto> GetAllDepartmentsAsync()
     {
-        var departments = await _context.Departments.ToListAsync();
+        var departments = await _context.Departments
+            .Include(d => d.Employees)
+            .ToListAsync();
 
         return departments.DepartmentsDto();
     }
@@ -57,20 +67,13 @@ public class DepartmentService(EmployeeAppDbContext _context, ILogger<Department
     public async Task<DepartmentDto> GetDepartmentByIdAsync(Guid departmentId)
     {
         var department = await _context.Departments
-       .FirstOrDefaultAsync(d => d.Id == departmentId);
+            .Include(d => d.Employees)
+            .FirstOrDefaultAsync(d => d.Id == departmentId);
 
         if (department == null)
             return null;
 
-
-        var departmentDto = new DepartmentDto
-        {
-            Id = department.Id,
-            Name = department.Name,
-            Description = department.Description
-        };
-
-        return departmentDto;
+        return department.ToDto();
     }
 
     public async Task<DepartmentDto> UpdateDepartmentAsync(UpdateDepartmentDto departmentDto)
