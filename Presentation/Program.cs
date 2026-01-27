@@ -9,7 +9,7 @@ using Data.Context;
 using Data.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using MySql.EntityFrameworkCore.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,8 +39,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
-builder.Services.AddMySQLServer<EmployeeAppDbContext>(
-    builder.Configuration.GetConnectionString("DefaultConnection")!);
+builder.Services.AddDbContext<EmployeeAppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddServices();
 
