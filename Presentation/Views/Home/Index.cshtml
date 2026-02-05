@@ -377,10 +377,74 @@
     }
     else
     {
-        <div class="text-center py-5">
-            <h2 class="fw-bold">Ready to manage your team?</h2>
-            <p class="text-muted mb-4 fs-5">Sign in to access your administrative tools and organization insights.</p>
-            <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg rounded-pill px-5 shadow">Get Started</a>
+        Layout = "_AuthLayout";
+        <div class="container py-5">
+            <div class="row min-vh-75 align-items-center">
+                <div class="col-lg-6 fade-in-up">
+                    <div class="feature-pill" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: 1px solid rgba(37, 99, 235, 0.2);">
+                        <span class="badge bg-primary me-2">New</span> StaffHub v2.0 is here
+                    </div>
+                    <h1 class="hero-title display-4 fw-bold" style="color: #0f172a;">The smarter way <br> to manage your <br> <span style="color: #2563eb;">Workforce.</span></h1>
+                    <p class="hero-subtitle pe-lg-5" style="color: #475569;">Unified dashboard for leave management, attendance tracking, and team announcements. Built for modern businesses that value efficiency.</p>
+                    
+                    <div class="d-flex flex-wrap gap-3 mb-5">
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm border-0" style="background: #2563eb;">
+                            Start for Free <i class="bi bi-chevron-right ms-2 small"></i>
+                        </a>
+                        <a href="#features" class="btn btn-outline-secondary btn-lg rounded-pill px-5">
+                            Learn More
+                        </a>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-4 text-muted small">
+                        <div><i class="bi bi-check-circle-fill text-success me-2"></i>No Card Required</div>
+                        <div><i class="bi bi-check-circle-fill text-success me-2"></i>14-Day Trial</div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 d-none d-lg-block fade-in-up">
+                    <div class="glass-card p-2 overflow-hidden position-relative border-0 shadow-sm" style="background: white;">
+                        <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="Dashboard Preview" class="img-fluid rounded-4 shadow-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div id="features" class="row g-4 mt-5 pt-5">
+                <div class="col-md-4 fade-in-up">
+                    <div class="benefit-card h-100 p-4 border rounded-4 shadow-sm bg-white">
+                        <div class="benefit-icon mb-4" style="background: #eff6ff; color: #2563eb; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; rounded-3: 12px; font-size: 1.5rem; border-radius: 12px;">
+                            <i class="bi bi-calendar2-check"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Leave Management</h4>
+                        <p class="text-muted">Automated approval workflows and real-time balance tracking for your entire team.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 fade-in-up">
+                    <div class="benefit-card h-100 p-4 border rounded-4 shadow-sm bg-white">
+                        <div class="benefit-icon mb-4" style="background: #f5f3ff; color: #7c3aed; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; rounded-3: 12px; font-size: 1.5rem; border-radius: 12px;">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Attendance Logs</h4>
+                        <p class="text-muted">Secure clock-in/out system with geo-tagging and daily activity summaries.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 fade-in-up">
+                    <div class="benefit-card h-100 p-4 border rounded-4 shadow-sm bg-white">
+                        <div class="benefit-icon mb-4" style="background: #fffbeb; color: #d97706; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; rounded-3: 12px; font-size: 1.5rem; border-radius: 12px;">
+                            <i class="bi bi-megaphone"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Smart Comms</h4>
+                        <p class="text-muted">Broadcast company-wide announcements and keep everyone synchronized instantly.</p>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <style>
+            .min-vh-75 { min-height: 75vh; }
+            .benefit-card { transition: transform 0.3s ease; border: 1px solid #e2e8f0 !important; }
+            .benefit-card:hover { transform: translateY(-5px); }
+        </style>
     }
 </div>
+

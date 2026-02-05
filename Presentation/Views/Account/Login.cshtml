@@ -1,78 +1,115 @@
 ﻿@model LoginViewModel
 @{
-	ViewData["Title"] = "Sign In";
-	Layout = "_Layout";
+    ViewData["Title"] = "Sign In";
+    Layout = "_AuthLayout";
 }
 
-<div class="auth-wrapper border-0">
-	<div class="auth-left">
-		<h1 class="fw-bold display-5 mb-4">Welcome Back</h1>
-		<p class="lead mb-4">Glad to see you again! Log in to continue managing your workforce.</p>
-		<p class="small opacity-75">
-			StaffHub is your all-in-one platform for managing staff effectively and efficiently.
-		</p>
-		<div class="circle one"></div>
-		<div class="circle two"></div>
-	</div>
+<div class="container overflow-hidden">
+    <div class="auth-split">
+        <div class="auth-form-side fade-in-up">
+            <div class="glass-card">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold mb-2">Welcome Back</h2>
+                    <p class="text-muted">Enter your credentials to access your portal</p>
+                </div>
 
-	<div class="auth-right">
-		<h2 class="mb-2 fw-bold text-dark">Sign In</h2>
-		<p class="text-muted mb-4">Please enter your credentials</p>
-		
-		<form asp-action="Login" method="post">
-			<div class="mb-3">
-				<label asp-for="Email" class="form-label fw-medium"></label>
-				<input asp-for="Email" class="form-control bg-light border-0" placeholder="name@company.com" />
-				<span asp-validation-for="Email" class="text-danger small"></span>
-			</div>
+                <form asp-action="Login" method="post" class="needs-validation">
+                    <div class="mb-4">
+                        <label asp-for="Email" class="form-label small fw-bold text-uppercase opacity-75">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text auth-input border-end-0 pe-0">
+                                <i class="bi bi-envelope text-muted"></i>
+                            </span>
+                            <input asp-for="Email" class="form-control auth-input border-start-0" placeholder="name@company.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
 
-			<div class="mb-3 position-relative">
-				<label asp-for="Password" class="form-label fw-medium"></label>
-				<div class="input-group">
-					<input asp-for="Password" type="password" class="form-control bg-light border-0 pe-5" id="passwordInput" placeholder="Enter password" />
-					<button type="button" class="btn position-absolute end-0 top-0 h-100 border-0 bg-transparent text-muted px-3" onclick="togglePassword()" tabindex="-1" style="z-index: 10;">
-						<i class="bi bi-eye" id="toggleIcon"></i>
-					</button>
-				</div>
-				<span asp-validation-for="Password" class="text-danger small"></span>
-			</div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label asp-for="Password" class="form-label small fw-bold text-uppercase opacity-75 mb-0">Password</label>
+                            <a asp-action="ForgotPassword" class="text-primary small text-decoration-none">Forgot?</a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text auth-input border-end-0 pe-0">
+                                <i class="bi bi-lock text-muted"></i>
+                            </span>
+                            <input asp-for="Password" type="password" class="form-control auth-input border-start-0 border-end-0" id="passwordInput" placeholder="••••••••" />
+                            <button type="button" class="btn auth-input border-start-0 text-muted" onclick="togglePassword()" tabindex="-1">
+                                <i class="bi bi-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
 
-			<div class="d-flex justify-content-between align-items-center mb-4">
-				<div class="form-check">
-					<input asp-for="RememberMe" class="form-check-input" />
-					<label asp-for="RememberMe" class="form-check-label small text-muted"></label>
-				</div>
-				<a asp-action="ForgotPassword" class="small text-primary text-decoration-none fw-medium">Forgot Password?</a>
-			</div>
+                    <div class="mb-4">
+                        <div class="form-check custom-check">
+                            <input asp-for="RememberMe" class="form-check-input bg-transparent border-secondary" />
+                            <label asp-for="RememberMe" class="form-check-label small text-muted">Keep me signed in</label>
+                        </div>
+                    </div>
 
-			<button type="submit" class="btn btn-primary w-100 mb-3 py-3 shadow-sm rounded-pill">
-				Log In <i class="bi bi-arrow-right ms-2"></i>
-			</button>
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm mb-4" style="background: #2563eb; border: none;">
+                        Sign In <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
 
-			<p class="text-center text-muted mb-0 small">
-				Don't have an account? <a asp-action="Register" class="text-primary fw-bold text-decoration-none">Sign Up Now</a>
-			</p>
-		</form>
-	</div>
+                    <div class="text-center">
+                        <p class="text-muted small mb-0">
+                            New member? <a asp-action="Register" class="text-primary fw-bold text-decoration-none">Create an account</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="auth-visual-side d-none d-lg-block fade-in-up">
+            <div class="feature-pill">
+                <i class="bi bi-stars me-2"></i> Next-Gen Workforce Management
+            </div>
+            <h1 class="hero-title display-4" style="color: #0f172a;">Powering the future of <br> <span style="color: #2563eb;">Team Operations.</span></h1>
+            <p class="hero-subtitle" style="color: #475569;">Experience a seamless, intuitive, and data-driven approach to managing your most valuable asset—your people.</p>
+            
+            <div class="row g-4 mt-2">
+                <div class="col-6">
+                    <div class="benefit-card bg-white shadow-sm border rounded-4 p-4">
+                        <div class="benefit-icon mb-3" style="background: #eff6ff; color: #2563eb; width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                            <i class="bi bi-lightning-charge"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1">Lightning Fast</h6>
+                        <p class="small text-muted mb-0">Optimized workflows for maximum productivity.</p>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="benefit-card bg-white shadow-sm border rounded-4 p-4">
+                        <div class="benefit-icon mb-3" style="background: #ecfdf5; color: #10b981; width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1">Bank-Grade Security</h6>
+                        <p class="small text-muted mb-0">Your data is protected with TLS encryption.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-	<partial name="_ValidationScriptsPartial" />
-	<script>
-		function togglePassword() {
-			const passwordInput = document.getElementById('passwordInput');
-			const icon = document.getElementById('toggleIcon');
-			const type = passwordInput.getAttribute('type');
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const icon = document.getElementById('toggleIcon');
+            const type = passwordInput.getAttribute('type');
 
-			if (type === 'password') {
-				passwordInput.setAttribute('type', 'text');
-				icon.classList.remove('bi-eye');
-				icon.classList.add('bi-eye-slash');
-			} else {
-				passwordInput.setAttribute('type', 'password');
-				icon.classList.remove('bi-eye-slash');
-				icon.classList.add('bi-eye');
-			}
-		}
-	</script>
+            if (type === 'password') {
+                passwordInput.setAttribute('type', 'text');
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.setAttribute('type', 'password');
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+    </script>
 }

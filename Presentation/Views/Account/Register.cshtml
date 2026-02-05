@@ -1,61 +1,99 @@
 ﻿@model RegisterViewModel
 @{
     ViewData["Title"] = "Create Account";
-    Layout = "_Layout";
+    Layout = "_AuthLayout";
 }
 
-<div class="auth-wrapper border-0">
-    <div class="auth-left">
-        <h1 class="fw-bold display-5 mb-4">Join StaffHub</h1>
-        <p class="lead mb-4">Start managing your organization more effectively. Create your account in seconds.</p>
-        <p class="small opacity-75">
-            Your all-in-one platform for managing staff effectively and efficiently.
-        </p>
-        <div class="circle one"></div>
-        <div class="circle two"></div>
-    </div>
-
-    <div class="auth-right">
-        <h2 class="mb-2 fw-bold text-dark">Sign Up</h2>
-        <p class="text-muted mb-4">Create your administrator account</p>
-
-        <form asp-action="Register" method="post">
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label fw-medium"></label>
-                <input asp-for="Email" class="form-control bg-light border-0" placeholder="name@company.com" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3 position-relative">
-                <label asp-for="Password" class="form-label fw-medium"></label>
-                <div class="input-group">
-                    <input asp-for="Password" class="form-control bg-light border-0 pe-5" type="password" id="registerPassword" placeholder="Create password" />
-                    <button type="button" class="btn position-absolute end-0 top-0 h-100 border-0 bg-transparent text-muted px-3" onclick="togglePassword('registerPassword', 'registerPasswordIcon')" tabindex="-1" style="z-index: 10;">
-                        <i class="bi bi-eye" id="registerPasswordIcon"></i>
-                    </button>
+<div class="container overflow-hidden">
+    <div class="auth-split">
+        <div class="auth-form-side fade-in-up">
+            <div class="glass-card">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold mb-2">Join StaffHub</h2>
+                    <p class="text-muted">Start managing your organization effectively</p>
                 </div>
-                <span asp-validation-for="Password" class="text-danger small"></span>
-            </div>
 
-            <div class="mb-4 position-relative">
-                <label asp-for="ConfirmPassword" class="form-label fw-medium"></label>
-                <div class="input-group">
-                    <input asp-for="ConfirmPassword" class="form-control bg-light border-0 pe-5" type="password" id="confirmPassword" placeholder="Confirm password" />
-                    <button type="button" class="btn position-absolute end-0 top-0 h-100 border-0 bg-transparent text-muted px-3" onclick="togglePassword('confirmPassword', 'confirmPasswordIcon')" tabindex="-1" style="z-index: 10;">
-                        <i class="bi bi-eye" id="confirmPasswordIcon"></i>
+                <form asp-action="Register" method="post">
+                    <div class="mb-4">
+                        <label asp-for="Email" class="form-label small fw-bold text-uppercase opacity-75">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text auth-input border-end-0 pe-0">
+                                <i class="bi bi-envelope text-muted"></i>
+                            </span>
+                            <input asp-for="Email" class="form-control auth-input border-start-0" placeholder="name@company.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label small fw-bold text-uppercase opacity-75">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text auth-input border-end-0 pe-0">
+                                <i class="bi bi-lock text-muted"></i>
+                            </span>
+                            <input asp-for="Password" type="password" class="form-control auth-input border-start-0 border-end-0" id="registerPassword" placeholder="••••••••" />
+                            <button type="button" class="btn auth-input border-start-0 text-muted" onclick="togglePassword('registerPassword', 'registerPasswordIcon')" tabindex="-1">
+                                <i class="bi bi-eye" id="registerPasswordIcon"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ConfirmPassword" class="form-label small fw-bold text-uppercase opacity-75">Confirm Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text auth-input border-end-0 pe-0">
+                                <i class="bi bi-lock-check text-muted"></i>
+                            </span>
+                            <input asp-for="ConfirmPassword" type="password" class="form-control auth-input border-start-0 border-end-0" id="confirmPassword" placeholder="••••••••" />
+                            <button type="button" class="btn auth-input border-start-0 text-muted" onclick="togglePassword('confirmPassword', 'confirmPasswordIcon')" tabindex="-1">
+                                <i class="bi bi-eye" id="confirmPasswordIcon"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm mb-4" style="background: #2563eb; border: none;">
+                        Create Account <i class="bi bi-person-plus ms-2"></i>
                     </button>
-                </div>
-                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+
+                    <div class="text-center">
+                        <p class="text-muted small mb-0">
+                            Already have an account? <a asp-action="Login" class="text-primary fw-bold text-decoration-none">Sign In</a>
+                        </p>
+                    </div>
+                </form>
             </div>
+        </div>
 
-            <button type="submit" class="btn btn-primary w-100 mb-3 py-3 shadow-sm rounded-pill">
-                Create Account <i class="bi bi-person-plus ms-2"></i>
-            </button>
-
-            <p class="text-center text-muted mb-0 small">
-                Already have an account? <a asp-action="Login" class="text-primary fw-bold text-decoration-none">Sign In</a>
-            </p>
-        </form>
+        <div class="auth-visual-side d-none d-lg-block fade-in-up">
+            <div class="feature-pill">
+                <i class="bi bi-shield-lock me-2"></i> Enterprise Security Enabled
+            </div>
+            <h1 class="hero-title display-4" style="color: #0f172a;">Scale your team <br> with <span style="color: #2563eb;">Confidence.</span></h1>
+            <p class="hero-subtitle" style="color: #475569;">Unlimited users, deep analytics, and automated reporting. All in one unified platform.</p>
+            
+            <div class="row g-4 mt-2">
+                <div class="col-6">
+                    <div class="benefit-card bg-white shadow-sm border rounded-4 p-4">
+                        <div class="benefit-icon mb-3" style="background: #fffbeb; color: #d97706; width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1">Growth Ready</h6>
+                        <p class="small text-muted mb-0">Easily manage teams from 10 to 10,000.</p>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="benefit-card bg-white shadow-sm border rounded-4 p-4">
+                        <div class="benefit-icon mb-3" style="background: #fdf2f8; color: #db2777; width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                            <i class="bi bi-gear-wide-connected"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1">Smart Automation</h6>
+                        <p class="small text-muted mb-0">Let AI handle the tedious scheduling.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
