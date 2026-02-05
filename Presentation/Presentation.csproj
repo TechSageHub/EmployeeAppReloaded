@@ -27,6 +27,7 @@
   <Target Name="KillPresentationProcessBeforeBuild"
           BeforeTargets="Build"
           Condition="'$(OS)' == 'Windows_NT' and '$(KillLockedPresentationProcessBeforeBuild)' == 'true'">
+
     <Exec Command="taskkill /F /IM Presentation.exe /T"
           ContinueOnError="true"
           StandardOutputImportance="Low"
