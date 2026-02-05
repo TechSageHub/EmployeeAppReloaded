@@ -43,8 +43,19 @@ public class LeaveController(
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateLeaveRequestDto dto)
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var employee = await _employeeService.GetEmployeeByUserIdAsync(userId!);
+        if (employee == null)
+        {
+            _notyf.Warning("Please complete your profile before requesting leave.");
+            return RedirectToAction("Index", "Home");
+        }
+
+        dto.EmployeeId = employee.Id;
+
         if (!ModelState.IsValid) return View(dto);
 
         if (dto.StartDate < DateTime.Today)
@@ -74,6 +85,7 @@ public class LeaveController(
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Process(LeaveApprovalDto dto)
     {
         var result = await _leaveService.ProcessLeaveRequestAsync(dto);

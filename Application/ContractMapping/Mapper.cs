@@ -149,6 +149,8 @@ public static class Mapper
             Email = employee.Email,
             FirstName = employee.FirstName,
             LastName = employee.LastName,
+            Gender = employee.Gender,
+            PhoneNumber = employee.PhoneNumber,
             DepartmentId = employee.DepartmentId,
             ImageUrl = employee.ImageUrl,
             Address = employee.Address?.ToDto()
@@ -233,7 +235,9 @@ public static class Mapper
             DepartmentId = createEmployeeDto.DepartmentId,
             Email = createEmployeeDto.Email,
             FirstName = createEmployeeDto.FirstName,
-            LastName = createEmployeeDto.LastName
+            LastName = createEmployeeDto.LastName,
+            Gender = createEmployeeDto.Gender,
+            PhoneNumber = createEmployeeDto.PhoneNumber
         };
     }
 
@@ -283,7 +287,7 @@ public static class Mapper
             LeaveType = dto.LeaveType,
             Reason = dto.Reason,
             Status = LeaveStatus.Pending,
-            DateRequested = DateTime.Now
+            DateRequested = DateTime.UtcNow
         };
     }
 }

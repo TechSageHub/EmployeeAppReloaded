@@ -5,9 +5,18 @@
 }
 
 <div class="mb-4">
-    <a asp-action="Index" class="text-decoration-none text-muted">
-        <i class="bi bi-arrow-left me-1"></i> Back to Directory
-    </a>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Index" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left me-1"></i> Back to Directory
+        </a>
+    }
+    else
+    {
+        <a asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    }
 </div>
 
 <div class="row">
@@ -29,9 +38,12 @@
             <p class="text-muted mb-3">@Model.DepartmentName</p>
             
             <div class="d-grid gap-2 d-md-block">
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary px-4 rounded-pill">
-                    <i class="bi bi-pencil me-2"></i>Edit
-                </a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary px-4 rounded-pill">
+                        <i class="bi bi-pencil me-2"></i>Edit
+                    </a>
+                }
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
                     <form asp-action="DeleteImage" asp-route-employeeId="@Model.Id" method="post" class="d-inline">
@@ -52,6 +64,24 @@
                 <div>
                     <div class="small text-muted">Email</div>
                     <div class="fw-medium">@Model.Email</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center mb-3">
+                <div class="bg-light p-2 rounded-circle text-primary me-3">
+                    <i class="bi bi-telephone"></i>
+                </div>
+                <div>
+                    <div class="small text-muted">Phone</div>
+                    <div class="fw-medium">@(!string.IsNullOrWhiteSpace(Model.PhoneNumber) ? Model.PhoneNumber : "N/A")</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center mb-3">
+                <div class="bg-light p-2 rounded-circle text-primary me-3">
+                    <i class="bi bi-gender-ambiguous"></i>
+                </div>
+                <div>
+                    <div class="small text-muted">Gender</div>
+                    <div class="fw-medium">@(!string.IsNullOrWhiteSpace(Model.Gender) ? Model.Gender : "N/A")</div>
                 </div>
             </div>
             <div class="d-flex align-items-center mb-3">

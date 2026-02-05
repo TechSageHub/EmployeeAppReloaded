@@ -1,20 +1,18 @@
 using Application.Dtos;
 using Application.Services.Document;
-using Application.Services.Employee;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Presentation.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class DocumentController(
     IDocumentService _documentService,
-    IEmployeeService _employeeService,
     INotyfService _notyf) : Controller
 {
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Upload(UploadDocumentDto dto)
     {
         if (!ModelState.IsValid)
@@ -38,6 +36,7 @@ public class DocumentController(
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(Guid id, Guid employeeId)
     {
         var result = await _documentService.DeleteDocumentAsync(id);

@@ -7,7 +7,7 @@ using Presentation.DtoMapping;
 using Presentation.Models;
 
 namespace Presentation.Controllers;
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class DepartmentController : BaseController
 {
     private readonly IDepartmentService _departmentService;
@@ -155,6 +155,7 @@ public class DepartmentController : BaseController
 
     [HttpPost("Department/Delete")]
     [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
         try

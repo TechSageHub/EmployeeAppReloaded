@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Application.Services.Email;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 
 namespace Application.Services.Employee;
 
@@ -32,6 +34,15 @@ public class EmployeeService : IEmployeeService
         _emailService = emailService;
     }
 
+    private bool IsAdmin => _httpContextAccessor.HttpContext?.User?.IsInRole("Admin") ?? false;
+    private string? CurrentUserId => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    private static string GenerateTempPassword()
+    {
+        // Ensure password meets typical complexity requirements.
+        return $"Aa1!{Guid.NewGuid():N}".Substring(0, 16);
+    }
+
     public async Task<EmployeeDto?> CreateEmployeeAsync(CreateEmployeeDto dto)
     {
         try
@@ -42,8 +53,37 @@ public class EmployeeService : IEmployeeService
                 return null;
             }
 
+            var existingUser = await _userManager.FindByEmailAsync(dto.Email);
+            if (existingUser != null)
+            {
+                return null;
+            }
+
+            // Create Identity User for the employee
+            var tempPassword = GenerateTempPassword();
+            var user = new IdentityUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                EmailConfirmed = true
+            };
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            var createUserResult = await _userManager.CreateAsync(user, tempPassword);
+            if (!createUserResult.Succeeded)
+            {
+                return null;
+            }
+
+            var roleResult = await _userManager.AddToRoleAsync(user, "User");
+            if (!roleResult.Succeeded)
+            {
+                await _userManager.DeleteAsync(user);
+                return null;
+            }
+
             var employee = dto.ToModel();
-            employee.UserId = dto.UserId;
+            employee.UserId = user.Id;
 
             if (dto.Photo != null && dto.Photo.Length > 0)
             {
@@ -68,50 +108,37 @@ public class EmployeeService : IEmployeeService
 
             await _context.Employees.AddAsync(employee);
             await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
 
-            // Create Identity User for the employee
-            var tempPassword = "StaffHub@2026";
-            var user = new IdentityUser
-            {
-                UserName = dto.Email,
-                Email = dto.Email,
-                EmailConfirmed = true
-            };
+            // Send Onboarding Email with password reset link
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+            var request = _httpContextAccessor.HttpContext?.Request;
+            var baseUrl = request == null ? string.Empty : $"{request.Scheme}://{request.Host}";
+            var resetLink = string.IsNullOrEmpty(baseUrl)
+                ? "#"
+                : $"{baseUrl}/Account/ResetPassword?email={dto.Email}&token={encodedToken}";
 
-            var createUserResult = await _userManager.CreateAsync(user, tempPassword);
-            if (createUserResult.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(user, "User");
-                
-                // Update employee with the new UserId
-                employee.UserId = user.Id;
-                _context.Employees.Update(employee);
-                await _context.SaveChangesAsync();
+            var subject = "Welcome to StaffHub - Set Your Password";
+            var body = $@"
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;'>
+                    <h2 style='color: #0d6efd;'>Welcome to the Team, {dto.FirstName}!</h2>
+                    <p>Hi {dto.FirstName},</p>
+                    <p>Your employee account has been created in the <strong>StaffHub</strong> portal.</p>
 
-                // Send Onboarding Email
-                var subject = "Welcome to StaffHub - Your Account Details";
-                var body = $@"
-                    <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;'>
-                        <h2 style='color: #0d6efd;'>Welcome to the Team, {dto.FirstName}!</h2>
-                        <p>Hi {dto.FirstName},</p>
-                        <p>Your employee account has been successfully created in the <strong>StaffHub</strong> portal. You can now log in to manage your profile and view your employment details.</p>
-                        
-                        <div style='background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;'>
-                            <h4 style='margin-top: 0;'>Your Login Credentials:</h4>
-                            <p style='margin-bottom: 5px;'><strong>Email/Username:</strong> {dto.Email}</p>
-                            <p style='margin-bottom: 0;'><strong>Password:</strong> {tempPassword}</p>
-                        </div>
+                    <div style='background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;'>
+                        <h4 style='margin-top: 0;'>Your Login Username:</h4>
+                        <p style='margin-bottom: 0;'><strong>Email/Username:</strong> {dto.Email}</p>
+                    </div>
 
-                        <p>For security reasons, we recommend that you change your password after your first login.</p>
-                        
-                        <a href='#' style='display: inline-block; background-color: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 10px;'>Go to Portal</a>
+                    <p>For security, please set your password using the link below:</p>
+                    <a href='{resetLink}' style='display: inline-block; background-color: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 10px;'>Set Password</a>
 
-                        <hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>
-                        <p style='font-size: 12px; color: #777;'>Sent from StaffHub Employee Management System.</p>
-                    </div>";
+                    <hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>
+                    <p style='font-size: 12px; color: #777;'>Sent from StaffHub Employee Management System.</p>
+                </div>";
 
-                await _emailService.SendEmailAsync(dto.Email, subject, body);
-            }
+            await _emailService.SendEmailAsync(dto.Email, subject, body);
 
             return employee.ToDto();
         }
@@ -124,14 +151,27 @@ public class EmployeeService : IEmployeeService
 
     public async Task DeleteEmployeeAsync(Guid employeeId)
     {
-        var employee = await _context.Employees.FindAsync(employeeId);
+        var employee = await _context.Employees
+            .Include(e => e.Address)
+            .FirstOrDefaultAsync(e => e.Id == employeeId);
         if (employee == null)
         {
             throw new KeyNotFoundException("Employee not found.");
         }
 
-        if (employee.Address != null)
-            _context.Addresses.Remove(employee.Address); // explicitly remove the address
+        if (!IsAdmin && !string.Equals(employee.UserId, CurrentUserId, StringComparison.Ordinal))
+        {
+            throw new UnauthorizedAccessException("You are not authorized to delete this employee.");
+        }
+
+        if (!string.IsNullOrEmpty(employee.ImageUrl))
+        {
+            var publicId = _ImageService.ExtractPublicIdFromUrl(employee.ImageUrl);
+            if (!string.IsNullOrEmpty(publicId))
+            {
+                await _ImageService.DeleteImageAsync(publicId);
+            }
+        }
 
         _context.Employees.Remove(employee);
         await _context.SaveChangesAsync();
@@ -192,6 +232,8 @@ public class EmployeeService : IEmployeeService
             LastName = employee.LastName,
             FirstName = employee.FirstName,
             Email = employee.Email,
+            Gender = employee.Gender,
+            PhoneNumber = employee.PhoneNumber,
             ImageUrl = employee.ImageUrl,
             Address = employee.Address == null ? null : new AddressDto
             {
@@ -214,12 +256,19 @@ public class EmployeeService : IEmployeeService
         if (employee == null)
             return null;
 
+        if (!IsAdmin && !string.Equals(employee.UserId, CurrentUserId, StringComparison.Ordinal))
+        {
+            return null;
+        }
+
         employee.FirstName = employeeDto.FirstName;
         employee.LastName = employeeDto.LastName;
         employee.Salary = employeeDto.Salary;
         employee.Email = employeeDto.Email;
         employee.HireDate = employeeDto.HireDate;
         employee.DepartmentId = employeeDto.DepartmentId;
+        employee.Gender = employeeDto.Gender;
+        employee.PhoneNumber = employeeDto.PhoneNumber;
 
         // Add or update address
         if (!string.IsNullOrWhiteSpace(employeeDto.Street) ||
@@ -255,7 +304,11 @@ public class EmployeeService : IEmployeeService
             // Delete old image if exists
             if (!string.IsNullOrEmpty(employee.ImageUrl))
             {
-                await _ImageService.DeleteImageAsync(employee.ImageUrl);
+                var publicId = _ImageService.ExtractPublicIdFromUrl(employee.ImageUrl);
+                if (!string.IsNullOrEmpty(publicId))
+                {
+                    await _ImageService.DeleteImageAsync(publicId);
+                }
             }
 
             var imageUrl = await _ImageService.UploadImageAsync(employeeDto.Photo);
@@ -281,6 +334,8 @@ public class EmployeeService : IEmployeeService
             DepartmentId = employee.DepartmentId,
             HireDate = employee.HireDate,
             Salary = employee.Salary,
+            Gender = employee.Gender,
+            PhoneNumber = employee.PhoneNumber,
             ImageUrl = employee.ImageUrl
         };
     }
@@ -291,6 +346,11 @@ public class EmployeeService : IEmployeeService
 
         if (employee != null && !string.IsNullOrEmpty(employee.ImageUrl))
         {
+            if (!IsAdmin && !string.Equals(employee.UserId, CurrentUserId, StringComparison.Ordinal))
+            {
+                throw new UnauthorizedAccessException("You are not authorized to delete this image.");
+            }
+
             string publicId = _ImageService.ExtractPublicIdFromUrl(employee.ImageUrl);
 
             if (!string.IsNullOrEmpty(publicId))

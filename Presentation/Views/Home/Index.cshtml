@@ -18,93 +18,93 @@
 
     @if (User.Identity!.IsAuthenticated)
     {
-        <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
-                    <div class="card-body p-4 d-flex align-items-center">
-                        <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-4 me-3">
-                            <i class="bi bi-people fs-2"></i>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                        <div class="card-body p-4 d-flex align-items-center">
+                            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-4 me-3">
+                                <i class="bi bi-people fs-2"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted small text-uppercase fw-bold mb-1">Total Employees</h6>
+                                <h2 class="fw-bold mb-0">@ViewBag.TotalEmployees</h2>
+                            </div>
                         </div>
-                        <div>
-                            <h6 class="text-muted small text-uppercase fw-bold mb-1">Total Employees</h6>
-                            <h2 class="fw-bold mb-0">@ViewBag.TotalEmployees</h2>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                        <div class="card-body p-4 d-flex align-items-center">
+                            <div class="bg-info bg-opacity-10 text-info p-3 rounded-4 me-3">
+                                <i class="bi bi-building fs-2"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted small text-uppercase fw-bold mb-1">Departments</h6>
+                                <h2 class="fw-bold mb-0">@ViewBag.TotalDepartments</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                        <div class="card-body p-4 d-flex align-items-center">
+                            <div class="bg-success bg-opacity-10 text-success p-3 rounded-4 me-3">
+                                <i class="bi bi-check-circle fs-2"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted small text-uppercase fw-bold mb-1">System Status</h6>
+                                <h2 class="fw-bold mb-0 text-success fs-4">Operational</h2>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
-                    <div class="card-body p-4 d-flex align-items-center">
-                        <div class="bg-info bg-opacity-10 text-info p-3 rounded-4 me-3">
-                            <i class="bi bi-building fs-2"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-muted small text-uppercase fw-bold mb-1">Departments</h6>
-                            <h2 class="fw-bold mb-0">@ViewBag.TotalDepartments</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
-                    <div class="card-body p-4 d-flex align-items-center">
-                        <div class="bg-success bg-opacity-10 text-success p-3 rounded-4 me-3">
-                            <i class="bi bi-check-circle fs-2"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-muted small text-uppercase fw-bold mb-1">System Status</h6>
-                            <h2 class="fw-bold mb-0 text-success fs-4">Operational</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="row g-4">
-            <div class="col-lg-8">
-                <div class="card border-0 shadow-sm rounded-4 h-100">
-                    <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                        <h5 class="fw-bold mb-0">Recent Hires</h5>
-                        <a asp-controller="Employee" asp-action="Index" class="btn btn-sm btn-light rounded-pill px-3">View All</a>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th class="ps-4">Name</th>
-                                        <th>Department</th>
-                                        <th class="text-end pe-4">Hire Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var emp in recentEmployees)
-                                    {
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold mb-0">Recent Hires</h5>
+                            <a asp-controller="Employee" asp-action="Index" class="btn btn-sm btn-light rounded-pill px-3">View All</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
                                         <tr>
-                                            <td class="ps-4">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-sm bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-2" style="width: 32px; height: 32px; font-size: 12px;">
-                                                        @emp.FirstName[0]@emp.LastName[0]
-                                                    </div>
-                                                    <span class="fw-medium">@emp.FirstName @emp.LastName</span>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge bg-light text-dark border fw-normal">@emp.DepartmentName</span></td>
-                                            <td class="text-end pe-4 text-muted small">@emp.HireDate.ToString("MMM dd, yyyy")</td>
+                                            <th class="ps-4">Name</th>
+                                            <th>Department</th>
+                                            <th class="text-end pe-4">Hire Date</th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var emp in recentEmployees)
+                                        {
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-sm bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-2" style="width: 32px; height: 32px; font-size: 12px;">
+                                                            @emp.FirstName[0]@emp.LastName[0]
+                                                        </div>
+                                                        <span class="fw-medium">@emp.FirstName @emp.LastName</span>
+                                                    </div>
+                                                </td>
+                                                <td><span class="badge bg-light text-dark border fw-normal">@emp.DepartmentName</span></td>
+                                                <td class="text-end pe-4 text-muted small">@emp.HireDate.ToString("MMM dd, yyyy")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4 h-100">
-                    <h5 class="fw-bold mb-3">Quick Actions</h5>
-                    <div class="d-grid gap-3">
-                        @if (User.IsInRole("Admin"))
-                        {
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4 h-100">
+                        <h5 class="fw-bold mb-3">Quick Actions</h5>
+                        <div class="d-grid gap-3">
                             <a asp-controller="Employee" asp-action="Create" class="btn btn-light text-start py-3 rounded-3 shadow-sm border-0">
                                 <i class="bi bi-person-plus me-2 text-primary"></i> Add New Employee
                             </a>
@@ -114,70 +114,188 @@
                             <a asp-controller="Employee" asp-action="BulkUpload" class="btn btn-light text-start py-3 rounded-3 shadow-sm border-0">
                                 <i class="bi bi-cloud-upload me-2 text-primary"></i> Bulk Upload Data
                             </a>
-                        }
-                        <a asp-controller="Leave" asp-action="Create" class="btn btn-light text-start py-3 rounded-3 shadow-sm border-0">
-                            <i class="bi bi-calendar-check me-2 text-primary"></i> Request Leave
-                        </a>
+                            <a asp-controller="Leave" asp-action="AdminDashboard" class="btn btn-light text-start py-3 rounded-3 shadow-sm border-0">
+                                <i class="bi bi-clipboard-check me-2 text-primary"></i> Leave Approvals
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row g-4 mt-2">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm rounded-4">
-                    <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                        <h5 class="fw-bold mb-0"><i class="bi bi-megaphone me-2"></i>Company Announcements</h5>
-                        @if (User.IsInRole("Admin"))
-                        {
+            <div class="row g-4 mt-2">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold mb-0"><i class="bi bi-megaphone me-2"></i>Company Announcements</h5>
                             <a asp-controller="Announcement" asp-action="Create" class="btn btn-sm btn-primary rounded-pill px-3">Post Announcement</a>
-                        }
-                    </div>
-                    <div class="card-body p-4">
-                        @{
-                            var announcements = ViewBag.Announcements as List<Application.Dtos.AnnouncementDto> ?? new List<Application.Dtos.AnnouncementDto>();
-                        }
-                        @if (!announcements.Any())
-                        {
-                            <div class="text-center py-4 text-muted">
-                                <i class="bi bi-megaphone fs-1 opacity-25 d-block mb-2"></i>
-                                No announcements yet.
-                            </div>
-                        }
-                        else
-                        {
-                            @foreach (var announcement in announcements)
+                        </div>
+                        <div class="card-body p-4">
+                            @{
+                                var announcements = ViewBag.Announcements as List<Application.Dtos.AnnouncementDto> ?? new List<Application.Dtos.AnnouncementDto>();
+                            }
+                            @if (!announcements.Any())
                             {
-                                <div class="alert alert-@(announcement.IsPinned ? "primary" : "light") border-0 shadow-sm mb-3">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="fw-bold mb-1">
-                                                @if (announcement.IsPinned)
-                                                {
-                                                    <i class="bi bi-pin-angle-fill me-1"></i>
-                                                }
-                                                @announcement.Title
-                                            </h6>
-                                            <p class="mb-2">@announcement.Content</p>
-                                            <small class="text-muted">
-                                                <i class="bi bi-person-circle me-1"></i>@announcement.AuthorName • 
-                                                <i class="bi bi-calendar3 me-1"></i>@announcement.DatePosted.ToString("MMM dd, yyyy")
-                                            </small>
-                                        </div>
-                                    </div>
+                                <div class="text-center py-4 text-muted">
+                                    <i class="bi bi-megaphone fs-1 opacity-25 d-block mb-2"></i>
+                                    No announcements yet.
                                 </div>
                             }
-                            @if (User.IsInRole("Admin"))
+                            else
                             {
+                                @foreach (var announcement in announcements)
+                                {
+                                    <div class="alert alert-@(announcement.IsPinned ? "primary" : "light") border-0 shadow-sm mb-3">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <h6 class="fw-bold mb-1">
+                                                    @if (announcement.IsPinned)
+                                                    {
+                                                        <i class="bi bi-pin-angle-fill me-1"></i>
+                                                    }
+                                                    @announcement.Title
+                                                </h6>
+                                                <p class="mb-2">@announcement.Content</p>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-person-circle me-1"></i>@announcement.AuthorName • 
+                                                    <i class="bi bi-calendar3 me-1"></i>@announcement.DatePosted.ToString("MMM dd, yyyy")
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                                 <div class="text-center mt-3">
                                     <a asp-controller="Announcement" asp-action="Index" class="btn btn-light rounded-pill">Manage All Announcements</a>
                                 </div>
                             }
-                        }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        }
+        else
+        {
+            var myEmployee = ViewBag.MyEmployee as EmployeeDto;
+            var leaveBalance = ViewBag.LeaveBalance as int? ?? 0;
+            var todayAttendance = ViewBag.TodayAttendance as AttendanceLogDto;
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                        <div class="card-body p-4 d-flex align-items-center">
+                            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-4 me-3">
+                                <i class="bi bi-person-badge fs-2"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted small text-uppercase fw-bold mb-1">My Profile</h6>
+                                <h2 class="fw-bold mb-0 fs-5">@((myEmployee == null) ? "Complete Profile" : $"{myEmployee.FirstName} {myEmployee.LastName}")</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                        <div class="card-body p-4 d-flex align-items-center">
+                            <div class="bg-info bg-opacity-10 text-info p-3 rounded-4 me-3">
+                                <i class="bi bi-calendar-check fs-2"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted small text-uppercase fw-bold mb-1">Leave Balance</h6>
+                                <h2 class="fw-bold mb-0">@leaveBalance days</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                        <div class="card-body p-4 d-flex align-items-center">
+                            <div class="bg-success bg-opacity-10 text-success p-3 rounded-4 me-3">
+                                <i class="bi bi-clock-history fs-2"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted small text-uppercase fw-bold mb-1">Today's Attendance</h6>
+                                <h2 class="fw-bold mb-0 fs-6">
+                                    @if (todayAttendance?.ClockOutTime != null)
+                                    {
+                                        <span>Clocked Out</span>
+                                    }
+                                    else if (todayAttendance != null)
+                                    {
+                                        <span>Clocked In</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Not Clocked In</span>
+                                    }
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4 h-100">
+                        <h5 class="fw-bold mb-3">Quick Actions</h5>
+                        <div class="d-grid gap-3">
+                            <a asp-controller="Account" asp-action="EditProfile" class="btn btn-light text-start py-3 rounded-3 shadow-sm border-0">
+                                <i class="bi bi-person-gear me-2 text-primary"></i> Edit Profile
+                            </a>
+                            <a asp-controller="Attendance" asp-action="Index" class="btn btn-light text-start py-3 rounded-3 shadow-sm border-0">
+                                <i class="bi bi-clock me-2 text-primary"></i> Attendance
+                            </a>
+                            <a asp-controller="Leave" asp-action="Create" class="btn btn-light text-start py-3 rounded-3 shadow-sm border-0">
+                                <i class="bi bi-calendar-check me-2 text-primary"></i> Request Leave
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold mb-0"><i class="bi bi-megaphone me-2"></i>Company Announcements</h5>
+                            <a asp-controller="Announcement" asp-action="Index" class="btn btn-sm btn-light rounded-pill px-3">View All</a>
+                        </div>
+                        <div class="card-body p-4">
+                            @{
+                                var announcements = ViewBag.Announcements as List<Application.Dtos.AnnouncementDto> ?? new List<Application.Dtos.AnnouncementDto>();
+                            }
+                            @if (!announcements.Any())
+                            {
+                                <div class="text-center py-4 text-muted">
+                                    <i class="bi bi-megaphone fs-1 opacity-25 d-block mb-2"></i>
+                                    No announcements yet.
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (var announcement in announcements)
+                                {
+                                    <div class="alert alert-@(announcement.IsPinned ? "primary" : "light") border-0 shadow-sm mb-3">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <h6 class="fw-bold mb-1">
+                                                    @if (announcement.IsPinned)
+                                                    {
+                                                        <i class="bi bi-pin-angle-fill me-1"></i>
+                                                    }
+                                                    @announcement.Title
+                                                </h6>
+                                                <p class="mb-2">@announcement.Content</p>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-person-circle me-1"></i>@announcement.AuthorName • 
+                                                    <i class="bi bi-calendar3 me-1"></i>@announcement.DatePosted.ToString("MMM dd, yyyy")
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     }
     else
     {

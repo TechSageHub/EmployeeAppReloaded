@@ -22,7 +22,13 @@ public static class SeedData
             }
         }
 
-        // Create initial Admin user
+        // Create initial Admin user only when an explicit password is provided
+        var adminPassword = Environment.GetEnvironmentVariable("ADMIN_INITIAL_PASSWORD");
+        if (string.IsNullOrWhiteSpace(adminPassword))
+        {
+            return;
+        }
+
         var adminEmail = "admin@staffhub.com";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
@@ -35,7 +41,7 @@ public static class SeedData
                 EmailConfirmed = true
             };
 
-            var createPowerUser = await userManager.CreateAsync(adminUser, "Admin@123");
+            var createPowerUser = await userManager.CreateAsync(adminUser, adminPassword);
             if (createPowerUser.Succeeded)
             {
                 await userManager.AddToRoleAsync(adminUser, "Admin");

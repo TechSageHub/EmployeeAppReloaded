@@ -35,6 +35,24 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
+                            <label asp-for="PhoneNumber" class="form-label fw-medium"></label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="Phone number" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Gender" class="form-label fw-medium"></label>
+                            <select asp-for="Gender" class="form-select">
+                                <option value="">-- Select --</option>
+                                <option value="Female">Female</option>
+                                <option value="Male">Male</option>
+                                <option value="Other">Other</option>
+                                <option value="Prefer not to say">Prefer not to say</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
                             <label asp-for="HireDate" class="form-label fw-medium"></label>
                             <input asp-for="HireDate" class="form-control" type="date" />
                             <span asp-validation-for="HireDate" class="text-danger small"></span>

@@ -17,7 +17,7 @@ public class AnnouncementService(EmployeeAppDbContext _context, UserManager<Iden
             Content = dto.Content,
             AuthorId = dto.AuthorId,
             IsPinned = dto.IsPinned,
-            DatePosted = DateTime.Now
+            DatePosted = DateTime.UtcNow
         };
 
         await _context.Announcements.AddAsync(announcement);
@@ -44,22 +44,20 @@ public class AnnouncementService(EmployeeAppDbContext _context, UserManager<Iden
             .Take(count)
             .ToListAsync();
 
-        var dtos = new List<AnnouncementDto>();
-        foreach (var announcement in announcements)
-        {
-            var author = await _userManager.FindByIdAsync(announcement.AuthorId);
-            dtos.Add(new AnnouncementDto
-            {
-                Id = announcement.Id,
-                Title = announcement.Title,
-                Content = announcement.Content,
-                DatePosted = announcement.DatePosted,
-                AuthorName = author?.UserName ?? "System",
-                IsPinned = announcement.IsPinned
-            });
-        }
+        var authorIds = announcements.Select(a => a.AuthorId).Distinct().ToList();
+        var authors = await _userManager.Users
+            .Where(u => authorIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => u.UserName);
 
-        return dtos;
+        return announcements.Select(announcement => new AnnouncementDto
+        {
+            Id = announcement.Id,
+            Title = announcement.Title,
+            Content = announcement.Content,
+            DatePosted = announcement.DatePosted,
+            AuthorName = authors.TryGetValue(announcement.AuthorId, out var name) ? name : "System",
+            IsPinned = announcement.IsPinned
+        }).ToList();
     }
 
     public async Task<List<AnnouncementDto>> GetAllAnnouncementsAsync()
@@ -69,22 +67,20 @@ public class AnnouncementService(EmployeeAppDbContext _context, UserManager<Iden
             .ThenByDescending(a => a.DatePosted)
             .ToListAsync();
 
-        var dtos = new List<AnnouncementDto>();
-        foreach (var announcement in announcements)
-        {
-            var author = await _userManager.FindByIdAsync(announcement.AuthorId);
-            dtos.Add(new AnnouncementDto
-            {
-                Id = announcement.Id,
-                Title = announcement.Title,
-                Content = announcement.Content,
-                DatePosted = announcement.DatePosted,
-                AuthorName = author?.UserName ?? "System",
-                IsPinned = announcement.IsPinned
-            });
-        }
+        var authorIds = announcements.Select(a => a.AuthorId).Distinct().ToList();
+        var authors = await _userManager.Users
+            .Where(u => authorIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => u.UserName);
 
-        return dtos;
+        return announcements.Select(announcement => new AnnouncementDto
+        {
+            Id = announcement.Id,
+            Title = announcement.Title,
+            Content = announcement.Content,
+            DatePosted = announcement.DatePosted,
+            AuthorName = authors.TryGetValue(announcement.AuthorId, out var name) ? name : "System",
+            IsPinned = announcement.IsPinned
+        }).ToList();
     }
 
     public async Task<bool> DeleteAnnouncementAsync(Guid id)

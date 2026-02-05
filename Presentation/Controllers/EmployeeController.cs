@@ -33,6 +33,17 @@ public class EmployeeController : BaseController
     public async Task<IActionResult> Index()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!User.IsInRole("Admin"))
+        {
+            var self = await _employeeService.GetEmployeeByUserIdAsync(userId!);
+            if (self == null)
+            {
+                return RedirectToAction("EditProfile", "Account");
+            }
+
+            return RedirectToAction(nameof(Details), new { id = self.Id });
+        }
+
         var employees = await _employeeService.GetAllEmployeesAsync(userId);
         var viewModel = employees.ToViewModel();
         return View(viewModel);
@@ -41,6 +52,15 @@ public class EmployeeController : BaseController
     public async Task<IActionResult> Details(Guid id)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!User.IsInRole("Admin"))
+        {
+            var currentEmployee = await _employeeService.GetEmployeeByUserIdAsync(userId!);
+            if (currentEmployee == null || currentEmployee.Id != id)
+            {
+                return Forbid();
+            }
+        }
+
         var employeeDto = await _employeeService.GetEmployeeByIdAsync(id, userId);
         if (employeeDto == null)
             return NotFound();
@@ -53,6 +73,8 @@ public class EmployeeController : BaseController
             Email = employeeDto.Email,
             HireDate = employeeDto.HireDate,
             Salary = employeeDto.Salary,
+            Gender = employeeDto.Gender,
+            PhoneNumber = employeeDto.PhoneNumber,
             ImageUrl = employeeDto.ImageUrl,
             DepartmentName = employeeDto.DepartmentName,
             Address = employeeDto.Address == null ? null : new AddressViewModel
@@ -69,6 +91,7 @@ public class EmployeeController : BaseController
         return View(viewModel);
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create()
     {
         var model = new CreateEmployeeViewModel();
@@ -77,6 +100,7 @@ public class EmployeeController : BaseController
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateEmployeeViewModel model)
     {
@@ -88,6 +112,8 @@ public class EmployeeController : BaseController
             Salary = model.Salary,
             Email = model.Email,
             HireDate = model.HireDate,
+            Gender = model.Gender,
+            PhoneNumber = model.PhoneNumber,
             Photo = model.Photo,
             UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
             Street = model.Street,
@@ -109,6 +135,7 @@ public class EmployeeController : BaseController
         return RedirectToAction(nameof(Index));
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> EditAsync(Guid id)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -126,6 +153,8 @@ public class EmployeeController : BaseController
             Email = employeeDto.Email,
             HireDate = employeeDto.HireDate,
             Salary = employeeDto.Salary,
+            Gender = employeeDto.Gender,
+            PhoneNumber = employeeDto.PhoneNumber,
             DepartmentId = employeeDto.DepartmentId,
             ImageUrl = employeeDto.ImageUrl,
             Street = employeeDto.Address?.Street,
@@ -140,6 +169,7 @@ public class EmployeeController : BaseController
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditAsync(Guid id, UpdateEmployeeViewModel model)
     {
@@ -148,12 +178,7 @@ public class EmployeeController : BaseController
 
         if (!ModelState.IsValid)
         {
-            var departmentsDto = await _departmentService.GetAllDepartmentsAsync();
-            model.Departments = departmentsDto.Departments.Select(d => new SelectListItem
-            {
-                Value = d.Id.ToString(),
-                Text = d.Name
-            }).ToList();
+            await PopulateUpdateData(model);
 
             foreach (var entry in ModelState)
             {
@@ -162,6 +187,8 @@ public class EmployeeController : BaseController
                     _notyf.Warning($"Field '{entry.Key}': {error.ErrorMessage}");
                 }
             }
+
+            return View(model);
         }
 
         try
@@ -174,6 +201,8 @@ public class EmployeeController : BaseController
                 Email = model.Email,
                 HireDate = model.HireDate,
                 Salary = model.Salary,
+                Gender = model.Gender,
+                PhoneNumber = model.PhoneNumber,
                 DepartmentId = model.DepartmentId,
                 Photo = model.Photo,
                 ImageUrl = model.ImageUrl,
@@ -199,6 +228,7 @@ public class EmployeeController : BaseController
     }
 
 
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -221,6 +251,8 @@ public class EmployeeController : BaseController
     }
 
     [HttpPost("Employee/Delete")]
+    [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
         await _employeeService.DeleteEmployeeAsync(id);
@@ -229,6 +261,7 @@ public class EmployeeController : BaseController
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteImage(Guid employeeId)
     {
         await _employeeService.DeleteImageAsync(employeeId);

@@ -1,6 +1,6 @@
 @model List<Application.Dtos.AnnouncementDto>
 @{
-    ViewData["Title"] = "Manage Announcements";
+    ViewData["Title"] = User.IsInRole("Admin") ? "Manage Announcements" : "Company Announcements";
 }
 
 <div class="container-fluid py-4">
@@ -9,11 +9,14 @@
             <h2 class="fw-bold mb-0">Company Announcements</h2>
             <p class="text-muted">Manage organization-wide communications.</p>
         </div>
-        <div class="col-md-4 text-md-end">
-            <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm">
-                <i class="bi bi-plus-lg me-2"></i>New Announcement
-            </a>
-        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="col-md-4 text-md-end">
+                <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                    <i class="bi bi-plus-lg me-2"></i>New Announcement
+                </a>
+            </div>
+        }
     </div>
 
     <div class="row g-4">
@@ -26,7 +29,10 @@
                     </div>
                     <h4 class="fw-bold">No Announcements Yet</h4>
                     <p class="text-muted mb-3">Start communicating with your team by posting your first announcement.</p>
-                    <a asp-action="Create" class="btn btn-primary rounded-pill px-4">Create Announcement</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Create" class="btn btn-primary rounded-pill px-4">Create Announcement</a>
+                    }
                 </div>
             </div>
         }
@@ -48,12 +54,15 @@
                                     <i class="bi bi-person-circle me-1"></i>@announcement.AuthorName<br/>
                                     <i class="bi bi-calendar3 me-1"></i>@announcement.DatePosted.ToString("MMM dd, yyyy")
                                 </small>
-                                <form asp-action="Delete" method="post" class="d-inline">
-                                    <input type="hidden" name="id" value="@announcement.Id" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" onclick="return confirm('Delete this announcement?')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <form asp-action="Delete" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@announcement.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" onclick="return confirm('Delete this announcement?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                }
                             </div>
                         </div>
                     </div>

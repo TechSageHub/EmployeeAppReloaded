@@ -30,7 +30,7 @@ public class DepartmentService(EmployeeAppDbContext _context, ILogger<Department
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred while creating the department.", ex);
+            _logger.LogError(ex, "An error occurred while creating the department.");
             return new DepartmentDto();
         }
     }

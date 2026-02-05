@@ -28,6 +28,12 @@ namespace Data.Configurations
             builder.Property(e => e.Salary)
                    .HasColumnType("decimal(18,2)");
 
+            builder.Property(e => e.Gender)
+                   .HasMaxLength(20);
+
+            builder.Property(e => e.PhoneNumber)
+                   .HasMaxLength(30);
+
             builder.Property(e => e.ImageUrl)
                    .HasMaxLength(300);
 

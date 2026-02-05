@@ -33,6 +33,7 @@ public class AttendanceController(
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> ClockIn()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -58,6 +59,7 @@ public class AttendanceController(
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> ClockOut()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

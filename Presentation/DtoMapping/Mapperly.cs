@@ -188,6 +188,8 @@ public static class Mapperly
             HireDate = dto.HireDate,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
+            Gender = dto.Gender,
+            PhoneNumber = dto.PhoneNumber,
             DepartmentName = dto.DepartmentName,
             ImageUrl = dto.ImageUrl,
             Address = dto.Address?.ToViewModel()
@@ -204,6 +206,8 @@ public static class Mapperly
             Email = vm.Email,
             HireDate = vm.HireDate,
             Salary = vm.Salary,
+            Gender = vm.Gender,
+            PhoneNumber = vm.PhoneNumber,
             ImageUrl = vm.ImageUrl,
             Address = vm.Address?.ToDto()
         };

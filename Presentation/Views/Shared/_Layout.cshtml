@@ -30,17 +30,29 @@
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Home" asp-action="Index">Dashboard</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Employee" asp-action="Index">Employees</a>
-                            </li>
-                             <li class="nav-item">
-                                 <a class="nav-link" asp-controller="Department" asp-action="Index">Departments</a>
-                             </li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Employee" asp-action="Index">Employees</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Department" asp-action="Index">Departments</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Account" asp-action="EditProfile">My Profile</a>
+                                </li>
+                            }
                              <li class="nav-item">
                                  <a class="nav-link" asp-controller="Leave" asp-action="Index">Leave Portal</a>
                              </li>
                              <li class="nav-item">
                                  <a class="nav-link" asp-controller="Attendance" asp-action="Index">Attendance</a>
+                             </li>
+                             <li class="nav-item">
+                                 <a class="nav-link" asp-controller="Announcement" asp-action="Index">Announcements</a>
                              </li>
                              @if (User.IsInRole("Admin"))
                              {

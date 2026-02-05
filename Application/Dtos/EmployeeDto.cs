@@ -11,6 +11,8 @@ public class EmployeeDto
     public string Email { get; set; } = default!;
     public DateTime HireDate { get; set; }
     public decimal Salary { get; set; }
+    public string? Gender { get; set; }
+    public string? PhoneNumber { get; set; }
     public Guid DepartmentId { get; set; } = default!;
     public string DepartmentName { get; set; }
     public string? ImageUrl { get; set; }
@@ -32,6 +34,8 @@ public class  CreateEmployeeDto
     public string Email { get; set; } = default!;
     public DateTime HireDate { get; set; }
     public decimal Salary { get; set; }
+    public string? Gender { get; set; }
+    public string? PhoneNumber { get; set; }
     public Guid DepartmentId { get; set; } = default!;
     public IFormFile? Photo { get; set; }
     public string? UserId { get; set; }
@@ -50,6 +54,8 @@ public class  UpdateEmployeeDto
     public string Email { get; set; } = default!;
     public DateTime HireDate { get; set; }
     public decimal Salary { get; set; }
+    public string? Gender { get; set; }
+    public string? PhoneNumber { get; set; }
     public Guid DepartmentId { get; set; } = default!;
     public IFormFile? Photo { get; set; }
     public string? ImageUrl { get; set; }

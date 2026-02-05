@@ -15,10 +15,10 @@
             <a asp-action="BulkUpload" class="btn btn-outline-primary d-flex align-items-center rounded-pill px-3">
                 <i class="bi bi-cloud-upload me-2"></i> Bulk Upload
             </a>
+            <a asp-action="Create" class="btn btn-primary d-flex align-items-center rounded-pill px-3">
+                <i class="bi bi-person-plus-fill me-2"></i> Add Employee
+            </a>
         }
-        <a asp-action="Create" class="btn btn-primary d-flex align-items-center rounded-pill px-3">
-            <i class="bi bi-person-plus-fill me-2"></i> Add Employee
-        </a>
     </div>
 </div>
 
@@ -29,7 +29,10 @@
             <div class="text-center py-5">
                 <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
                 <p class="mt-3 fs-5">No employees found. Start by adding one!</p>
-                <a asp-action="Create" class="btn btn-outline-primary mt-2">Add First Employee</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Create" class="btn btn-outline-primary mt-2">Add First Employee</a>
+                }
             </div>
         }
         else
@@ -75,8 +78,11 @@
                                 <td class="text-end pe-4">
                                     <div class="btn-group shadow-sm rounded">
                                         <a asp-action="Details" asp-route-id="@employee.Id" class="btn btn-white btn-sm border-end" title="View Details"><i class="bi bi-eye text-info"></i></a>
-                                        <a asp-action="Edit" asp-route-id="@employee.Id" class="btn btn-white btn-sm border-end" title="Edit"><i class="bi bi-pencil text-primary"></i></a>
-                                        <a asp-action="Delete" asp-route-id="@employee.Id" class="btn btn-white btn-sm" title="Delete"><i class="bi bi-trash text-danger"></i></a>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@employee.Id" class="btn btn-white btn-sm border-end" title="Edit"><i class="bi bi-pencil text-primary"></i></a>
+                                            <a asp-action="Delete" asp-route-id="@employee.Id" class="btn btn-white btn-sm" title="Delete"><i class="bi bi-trash text-danger"></i></a>
+                                        }
                                     </div>
                                 </td>
                             </tr>

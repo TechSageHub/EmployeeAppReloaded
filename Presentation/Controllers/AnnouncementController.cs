@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace Presentation.Controllers;
 
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class AnnouncementController(IAnnouncementService _announcementService, INotyfService _notyf) : Controller
 {
     public async Task<IActionResult> Index()
@@ -17,12 +17,15 @@ public class AnnouncementController(IAnnouncementService _announcementService, I
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         return View();
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateAnnouncementDto dto)
     {
         if (!ModelState.IsValid) return View(dto);
@@ -37,6 +40,8 @@ public class AnnouncementController(IAnnouncementService _announcementService, I
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await _announcementService.DeleteAnnouncementAsync(id);

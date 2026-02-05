@@ -52,6 +52,7 @@ namespace Presentation.Controllers
         public IActionResult Register() => View();
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
@@ -78,6 +79,7 @@ namespace Presentation.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
@@ -172,6 +174,7 @@ namespace Presentation.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
             if (!ModelState.IsValid)
@@ -209,6 +212,7 @@ namespace Presentation.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
@@ -254,6 +258,12 @@ namespace Presentation.Controllers
                 model.LastName = employee.LastName;
                 model.Email = employee.Email;
                 model.ImageUrl = employee.ImageUrl;
+                model.Gender = employee.Gender;
+                model.PhoneNumber = employee.PhoneNumber;
+                model.Street = employee.Address?.Street;
+                model.City = employee.Address?.City;
+                model.State = employee.Address?.State;
+                model.Country = employee.Address?.Country;
             }
 
             return View(model);
@@ -287,6 +297,12 @@ namespace Presentation.Controllers
                     LastName = model.LastName,
                     Email = model.Email,
                     ImageUrl = imageUrl,
+                    Gender = model.Gender,
+                    PhoneNumber = model.PhoneNumber,
+                    Street = model.Street,
+                    City = model.City,
+                    State = model.State,
+                    Country = model.Country,
                     // Preserve other fields if possible, or handle in service
                 };
                 
@@ -297,10 +313,10 @@ namespace Presentation.Controllers
                     dto.DepartmentId = current.DepartmentId;
                     dto.HireDate = current.HireDate;
                     dto.Salary = current.Salary;
-                    dto.Street = current.Street;
-                    dto.City = current.City;
-                    dto.State = current.State;
-                    // dto.Country = current.Country; // UpdateEmployeeDto fix applied earlier
+                    if (!User.IsInRole("Admin"))
+                    {
+                        dto.Email = current.Email;
+                    }
                 }
 
                 await _employeeService.UpdateEmployeeAsync(dto);
@@ -314,6 +330,12 @@ namespace Presentation.Controllers
                     LastName = model.LastName,
                     Email = model.Email,
                     UserId = userId,
+                    Gender = model.Gender,
+                    PhoneNumber = model.PhoneNumber,
+                    Street = model.Street,
+                    City = model.City,
+                    State = model.State,
+                    Country = model.Country,
                     // Admins might not have a department, or we use a default
                     DepartmentId = Guid.Empty, 
                     HireDate = DateTime.Now,

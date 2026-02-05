@@ -32,6 +32,21 @@ namespace Application.Services.UploadImage
             return result.SecureUrl.AbsoluteUri;
         }
 
+        public async Task<string> UploadFileAsync(IFormFile file, string folder)
+        {
+            using var stream = file.OpenReadStream();
+
+            var uploadParams = new RawUploadParams
+            {
+                File = new FileDescription(file.FileName, stream),
+                Folder = folder
+            };
+
+            var result = await _cloudinary.UploadAsync(uploadParams);
+
+            return result.SecureUrl.AbsoluteUri;
+        }
+
         public async Task<bool> DeleteImageAsync(string publicId)
         {
             if (string.IsNullOrEmpty(publicId))

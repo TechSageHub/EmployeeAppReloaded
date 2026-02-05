@@ -10,9 +10,11 @@ namespace Presentation.Models
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;
         public string Email { get; set; } = default!;
-        public DateTime HireDate { get; set; }
-        public decimal Salary { get; set; }
-        public Guid DepartmentId { get; set; }
+    public DateTime HireDate { get; set; }
+    public decimal Salary { get; set; }
+    public string? Gender { get; set; }
+    public string? PhoneNumber { get; set; }
+    public Guid DepartmentId { get; set; }
         public string DepartmentName { get; set; }
         public string? ImageUrl { get; set; }
         public AddressViewModel? Address { get; set; }
@@ -25,8 +27,10 @@ namespace Presentation.Models
         [Required]
         [DataType(DataType.DateTime)]
         public DateTime HireDate { get; set; } = DateTime.Now;
-        public decimal Salary { get; set; }
-        public Guid DepartmentId { get; set; }
+    public decimal Salary { get; set; }
+    public string? Gender { get; set; }
+    public string? PhoneNumber { get; set; }
+    public Guid DepartmentId { get; set; }
         public List<SelectListItem> Departments { get; set; } = new();
         public IFormFile? Photo { get; set; }
 
@@ -46,8 +50,10 @@ namespace Presentation.Models
         public string LastName { get; set; } = default!;
         public string Email { get; set; } = default!;
         public DateTime HireDate { get; set; }
-        public decimal Salary { get; set; }
-        public Guid DepartmentId { get; set; }
+    public decimal Salary { get; set; }
+    public string? Gender { get; set; }
+    public string? PhoneNumber { get; set; }
+    public Guid DepartmentId { get; set; }
         public List<SelectListItem> Departments { get; set; } = new();
         public IFormFile? Photo { get; set; }
         public string? ImageUrl { get; set; }

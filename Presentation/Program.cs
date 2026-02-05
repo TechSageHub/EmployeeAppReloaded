@@ -8,20 +8,26 @@ using CloudinaryDotNet;
 using Data.Context;
 using Data.Model;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.EntityFrameworkCore;
 using Data;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // AddAddress services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+});
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
-    
-    options.Password.RequireDigit = false;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+    options.User.RequireUniqueEmail = true;
 
    
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5); 
@@ -39,8 +45,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
-builder.Services.AddDbContext<EmployeeAppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddSqlServer<EmployeeAppDbContext>(
+    builder.Configuration.GetConnectionString("DefaultConnection")!);
 
 builder.Services.AddServices();
 
@@ -93,8 +99,9 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 
-using (var scope = app.Services.CreateScope())
+if (app.Environment.IsDevelopment())
 {
+    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     await SeedData.Initialize(services);
 }

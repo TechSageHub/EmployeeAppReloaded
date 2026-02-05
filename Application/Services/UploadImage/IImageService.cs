@@ -5,6 +5,8 @@ namespace Application.Services.UploadImage
     {
         Task<string> UploadImageAsync(IFormFile file);
 
+        Task<string> UploadFileAsync(IFormFile file, string folder);
+
         Task<bool> DeleteImageAsync(string publicId);
 
         string ExtractPublicIdFromUrl(string imageUrl);
