@@ -1,92 +1,101 @@
 ﻿@model LoginViewModel
 @{
-    ViewData["Title"] = "Sign In";
+    ViewData["Title"] = "Login";
     Layout = "_AuthLayout";
 }
 
-<div class="container overflow-hidden">
-    <div class="auth-split">
-        <div class="auth-form-side fade-in-up">
-            <div class="glass-card">
-                <div class="text-center mb-5">
-                    <h2 class="fw-bold mb-2">Welcome Back</h2>
-                    <p class="text-muted">Enter your credentials to access your portal</p>
+<div class="container">
+    <div class="row g-0 align-items-center justify-content-center min-vh-75">
+        <div class="col-lg-10 overflow-hidden rounded-4 shadow-premium bg-white">
+            <div class="row g-0">
+                <div class="col-lg-5 p-5 p-md-5 d-flex flex-column justify-content-center border-end">
+                    <div class="auth-header mb-5">
+                        <h2 class="fw-800 mb-2">Welcome Back</h2>
+                        <p class="text-muted opacity-75">Log in to your account.</p>
+                    </div>
+
+                    <form asp-action="Login" method="post" class="needs-validation">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+                        <div class="mb-4">
+                            <label asp-for="Email" class="form-label fw-bold small text-muted text-uppercase ls-wide mb-2">Email</label>
+                            <div class="position-relative">
+                                <input asp-for="Email" class="form-input-premium w-100 ps-5" placeholder="email@example.com" />
+                                <i class="bi bi-shield-lock position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label asp-for="Password" class="form-label fw-bold small text-muted text-uppercase ls-wide mb-0">Password</label>
+                                <a asp-action="ForgotPassword" class="text-primary-light small fw-bold text-decoration-none">Forgot Password?</a>
+                            </div>
+                            <div class="position-relative">
+                                <input asp-for="Password" type="password" class="form-input-premium w-100 ps-5 pe-5" id="passwordInput" placeholder="••••••••" />
+                                <i class="bi bi-key position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y me-2 text-muted border-0 bg-transparent" onclick="togglePassword()" tabindex="-1">
+                                    <i class="bi bi-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="mb-5">
+                            <div class="form-check p-0 d-flex align-items-center gap-2">
+                                <input asp-for="RememberMe" class="form-check-input ms-0 mt-0" style="width: 1.25rem; height: 1.25rem; cursor: pointer;" />
+                                <label asp-for="RememberMe" class="form-check-label small text-dark fw-bold" style="cursor: pointer;">Remember Me</label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-premium btn-premium-primary w-100 py-3 mb-4">
+                            Login <i class="bi bi-chevron-right ms-2"></i>
+                        </button>
+
+                        <div class="text-center pt-2">
+                            <p class="text-muted small mb-0">
+                                New user? <a asp-action="Register" class="text-primary-light fw-bold text-decoration-none">Register</a>
+                            </p>
+                        </div>
+                    </form>
                 </div>
 
-                <form asp-action="Login" method="post" class="needs-validation">
-                    <div class="mb-4">
-                        <label asp-for="Email" class="form-label small fw-bold text-uppercase opacity-75">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text auth-input border-end-0 pe-0">
-                                <i class="bi bi-envelope text-muted"></i>
-                            </span>
-                            <input asp-for="Email" class="form-control auth-input border-start-0" placeholder="name@company.com" />
+                <div class="col-lg-7 d-none d-lg-block position-relative bg-light overflow-hidden">
+                    <div class="auth-visual-content p-5 h-100 d-flex flex-column justify-content-between position-relative z-1">
+                        <div>
+                            <div class="badge bg-primary bg-opacity-25 text-primary px-3 py-2 rounded-pill fw-bold ls-wide mb-4">SYSTEM READY</div>
+                            <h1 class="display-4 fw-800 mt-2 mb-3">Manage your <br><span class="text-primary-light">Team easily.</span></h1>
+                            <p class="fs-5 text-dark opacity-75 max-w-400">Everything you need to manage staff in one place. Track attendance and leave with precision.</p>
                         </div>
-                        <span asp-validation-for="Email" class="text-danger small"></span>
-                    </div>
 
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label asp-for="Password" class="form-label small fw-bold text-uppercase opacity-75 mb-0">Password</label>
-                            <a asp-action="ForgotPassword" class="text-primary small text-decoration-none">Forgot?</a>
+                        <div class="mt-auto">
+                            <div class="row g-4">
+                                <div class="col-6">
+                                    <div class="bg-white p-4 rounded-4 shadow-sm border h-100">
+                                        <div class="bg-info bg-opacity-10 p-2 rounded-3 text-info d-inline-block mb-3">
+                                            <i class="bi bi-graph-up-arrow fs-4"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-1 text-dark">Insights</h6>
+                                        <p class="small text-muted mb-0 lh-sm">Track how the team is doing.</p>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="bg-white p-4 rounded-4 shadow-sm border h-100">
+                                        <div class="bg-success bg-opacity-10 p-2 rounded-3 text-success d-inline-block mb-3">
+                                            <i class="bi bi-shield-check fs-4"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-1 text-dark">Security</h6>
+                                        <p class="small text-muted mb-0 lh-sm">Your data is safe with us.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <span class="input-group-text auth-input border-end-0 pe-0">
-                                <i class="bi bi-lock text-muted"></i>
-                            </span>
-                            <input asp-for="Password" type="password" class="form-control auth-input border-start-0 border-end-0" id="passwordInput" placeholder="••••••••" />
-                            <button type="button" class="btn auth-input border-start-0 text-muted" onclick="togglePassword()" tabindex="-1">
-                                <i class="bi bi-eye" id="toggleIcon"></i>
-                            </button>
-                        </div>
-                        <span asp-validation-for="Password" class="text-danger small"></span>
                     </div>
-
-                    <div class="mb-4">
-                        <div class="form-check custom-check">
-                            <input asp-for="RememberMe" class="form-check-input bg-transparent border-secondary" />
-                            <label asp-for="RememberMe" class="form-check-label small text-muted">Keep me signed in</label>
-                        </div>
+                    
+                    <!-- Decorative elements -->
+                    <div class="position-absolute top-0 end-0 p-5 opacity-10">
+                        <i class="bi bi-stack display-1"></i>
                     </div>
-
-                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm mb-4" style="background: #2563eb; border: none;">
-                        Sign In <i class="bi bi-arrow-right ms-2"></i>
-                    </button>
-
-                    <div class="text-center">
-                        <p class="text-muted small mb-0">
-                            New member? <a asp-action="Register" class="text-primary fw-bold text-decoration-none">Create an account</a>
-                        </p>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="auth-visual-side d-none d-lg-block fade-in-up">
-            <div class="feature-pill">
-                <i class="bi bi-stars me-2"></i> Next-Gen Workforce Management
-            </div>
-            <h1 class="hero-title display-4" style="color: #0f172a;">Powering the future of <br> <span style="color: #2563eb;">Team Operations.</span></h1>
-            <p class="hero-subtitle" style="color: #475569;">Experience a seamless, intuitive, and data-driven approach to managing your most valuable asset—your people.</p>
-            
-            <div class="row g-4 mt-2">
-                <div class="col-6">
-                    <div class="benefit-card bg-white shadow-sm border rounded-4 p-4">
-                        <div class="benefit-icon mb-3" style="background: #eff6ff; color: #2563eb; width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
-                            <i class="bi bi-lightning-charge"></i>
-                        </div>
-                        <h6 class="fw-bold mb-1">Lightning Fast</h6>
-                        <p class="small text-muted mb-0">Optimized workflows for maximum productivity.</p>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="benefit-card bg-white shadow-sm border rounded-4 p-4">
-                        <div class="benefit-icon mb-3" style="background: #ecfdf5; color: #10b981; width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
-                            <i class="bi bi-shield-check"></i>
-                        </div>
-                        <h6 class="fw-bold mb-1">Bank-Grade Security</h6>
-                        <p class="small text-muted mb-0">Your data is protected with TLS encryption.</p>
-                    </div>
+                    <div class="position-absolute bottom-0 start-0 w-100 h-50 bg-gradient-to-t from-white to-transparent opacity-50"></div>
                 </div>
             </div>
         </div>

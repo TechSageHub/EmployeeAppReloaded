@@ -1,128 +1,142 @@
 ﻿@model Presentation.Models.EmployeeViewModel
 
 @{
-    ViewData["Title"] = "Employee Profile";
+    ViewData["Title"] = "Profile";
+    var firstInitial = !string.IsNullOrWhiteSpace(Model.FirstName) ? Model.FirstName[0].ToString() : "";
+    var lastInitial = !string.IsNullOrWhiteSpace(Model.LastName) ? Model.LastName[0].ToString() : "";
+    var initials = $"{firstInitial}{lastInitial}";
+    var departmentLabel = string.IsNullOrWhiteSpace(Model.DepartmentName) ? "UNASSIGNED" : Model.DepartmentName.ToUpper();
 }
 
-<div class="mb-4">
+<div class="mb-5 mt-2">
     @if (User.IsInRole("Admin"))
     {
-        <a asp-action="Index" class="text-decoration-none text-muted">
-            <i class="bi bi-arrow-left me-1"></i> Back to Directory
+        <a asp-action="Index" class="btn btn-sm btn-light border-0 px-3 text-muted fw-bold">
+            <i class="bi bi-arrow-left me-2"></i> BACK TO LIST
         </a>
     }
     else
     {
-        <a asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">
-            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        <a asp-controller="Home" asp-action="Index" class="btn btn-sm btn-light border-0 px-3 text-muted fw-bold">
+            <i class="bi bi-arrow-left me-2"></i> BACK TO DASHBOARD
         </a>
     }
 </div>
 
-<div class="row">
+<div class="row g-4">
     <div class="col-lg-4">
-        <div class="card border-0 shadow-sm text-center p-4 mb-4">
-            <div class="mb-3">
+        <div class="card-premium text-center p-5 mb-4 border-top border-4 border-primary">
+            <div class="position-relative d-inline-block mb-4">
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
-                    <img src="@Model.ImageUrl" alt="Profile" class="rounded-circle shadow-sm border border-4 border-white" style="width: 150px; height: 150px; object-fit: cover;" />
+                    <img src="@Model.ImageUrl" alt="Profile" class="rounded-circle shadow-lg border border-5 border-white" style="width: 160px; height: 160px; object-fit: cover;" />
                 }
                 else
                 {
-                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto text-primary fw-bold shadow-sm" style="width: 150px; height: 150px; font-size: 3rem;">
-                        @Model.FirstName[0]@Model.LastName[0]
+                    <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center mx-auto text-primary-light fw-bold shadow-sm" style="width: 160px; height: 160px; font-size: 3.5rem;">
+                        @initials
                     </div>
                 }
+                <div class="position-absolute bottom-0 end-0 bg-success border border-3 border-white rounded-circle" style="width: 25px; height: 25px;"></div>
             </div>
-            <h3 class="fw-bold mb-1">@Model.FirstName @Model.LastName</h3>
-            <p class="text-muted mb-3">@Model.DepartmentName</p>
             
-            <div class="d-grid gap-2 d-md-block">
+            <h2 class="fw-bold mb-1">@Model.FirstName @Model.LastName</h2>
+            <div class="badge bg-primary bg-opacity-10 text-primary-light px-3 py-2 rounded-pill fw-bold mb-4 ls-wide">@departmentLabel</div>
+            
+            <div class="d-flex justify-content-center gap-2 mt-2">
                 @if (User.IsInRole("Admin"))
                 {
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary px-4 rounded-pill">
-                        <i class="bi bi-pencil me-2"></i>Edit
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-premium btn-premium-primary w-100">
+                        <i class="bi bi-pencil-square"></i> Edit Profile
                     </a>
                 }
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
                     <form asp-action="DeleteImage" asp-route-employeeId="@Model.Id" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-outline-danger px-4 rounded-pill">
-                            <i class="bi bi-trash"></i>
+                        <button type="submit" class="btn btn-light border p-3 rounded-3 text-danger" title="Delete Image">
+                            <i class="bi bi-trash3"></i>
                         </button>
                     </form>
                 }
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm p-4">
-            <h5 class="fw-bold mb-3">Contact Information</h5>
-            <div class="d-flex align-items-center mb-3">
-                <div class="bg-light p-2 rounded-circle text-primary me-3">
-                    <i class="bi bi-envelope"></i>
+        <div class="card-premium p-4">
+            <h6 class="text-muted small text-uppercase ls-wide fw-bold mb-4">About</h6>
+            
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-light p-3 rounded-4 text-primary me-3">
+                    <i class="bi bi-envelope-at fs-5"></i>
                 </div>
                 <div>
-                    <div class="small text-muted">Email</div>
-                    <div class="fw-medium">@Model.Email</div>
+                    <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Email</div>
+                    <div class="fw-bold text-dark">@Model.Email</div>
                 </div>
             </div>
-            <div class="d-flex align-items-center mb-3">
-                <div class="bg-light p-2 rounded-circle text-primary me-3">
-                    <i class="bi bi-telephone"></i>
+            
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-light p-3 rounded-4 text-primary me-3">
+                    <i class="bi bi-telephone-plus fs-5"></i>
                 </div>
                 <div>
-                    <div class="small text-muted">Phone</div>
-                    <div class="fw-medium">@(!string.IsNullOrWhiteSpace(Model.PhoneNumber) ? Model.PhoneNumber : "N/A")</div>
+                    <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Phone Number</div>
+                    <div class="fw-bold text-dark">@(!string.IsNullOrWhiteSpace(Model.PhoneNumber) ? Model.PhoneNumber : "Unspecified")</div>
                 </div>
             </div>
-            <div class="d-flex align-items-center mb-3">
-                <div class="bg-light p-2 rounded-circle text-primary me-3">
-                    <i class="bi bi-gender-ambiguous"></i>
+
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-light p-3 rounded-4 text-primary me-3">
+                    <i class="bi bi-person-badge fs-5"></i>
                 </div>
                 <div>
-                    <div class="small text-muted">Gender</div>
-                    <div class="fw-medium">@(!string.IsNullOrWhiteSpace(Model.Gender) ? Model.Gender : "N/A")</div>
+                    <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Gender</div>
+                    <div class="fw-bold text-dark">@(!string.IsNullOrWhiteSpace(Model.Gender) ? Model.Gender : "Unspecified")</div>
                 </div>
             </div>
-            <div class="d-flex align-items-center mb-3">
-                <div class="bg-light p-2 rounded-circle text-primary me-3">
-                    <i class="bi bi-calendar-event"></i>
+
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-light p-3 rounded-4 text-primary me-3">
+                    <i class="bi bi-calendar-check fs-5"></i>
                 </div>
                 <div>
-                    <div class="small text-muted">Hire Date</div>
-                    <div class="fw-medium">@Model.HireDate.ToString("MMMM dd, yyyy")</div>
+                    <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Hire Date</div>
+                    <div class="fw-bold text-dark">@Model.HireDate.ToString("MMMM dd, yyyy")</div>
                 </div>
             </div>
+
             <div class="d-flex align-items-center">
-                <div class="bg-light p-2 rounded-circle text-primary me-3">
-                    <i class="bi bi-cash-stack"></i>
+                <div class="bg-light p-3 rounded-4 text-success me-3">
+                    <i class="bi bi-cash-stack fs-5"></i>
                 </div>
                 <div>
-                    <div class="small text-muted">Annual Salary</div>
-                    <div class="fw-medium">@Model.Salary.ToString("C")</div>
+                    <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Salary</div>
+                    <div class="fw-bold text-dark fs-5">@Model.Salary.ToString("C")</div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="col-lg-8">
-        <div class="card border-0 shadow-sm p-4 h-100">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold mb-0">Address Details</h5>
+        <div class="card-premium p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h5 class="fw-bold mb-1">Address</h5>
+                    <p class="text-muted small mb-0">Home address</p>
+                </div>
                 @if (Model.Address == null)
                 {
-                    <a asp-controller="Address" asp-action="Add" asp-route-employeeId="@Model.Id" class="btn btn-sm btn-outline-success rounded-pill px-3">
-                        <i class="bi bi-plus-lg me-1"></i>Add Address
+                    <a asp-controller="Address" asp-action="Add" asp-route-employeeId="@Model.Id" class="btn btn-premium btn-light border shadow-sm btn-sm">
+                        <i class="bi bi-geo-alt-fill me-1"></i> Add Address
                     </a>
                 }
                 else
                 {
-                    <div>
-                        <a asp-controller="Address" asp-action="Update" asp-route-employeeId="@Model.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2">
-                            Update
+                    <div class="d-flex gap-2">
+                        <a asp-controller="Address" asp-action="Update" asp-route-employeeId="@Model.Id" class="btn btn-sm btn-light border px-3 fw-bold shadow-sm">
+                            Edit
                         </a>
                         <form asp-controller="Address" asp-action="Delete" asp-route-employeeId="@Model.Id" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Delete address?')">Delete</button>
+                            <button type="submit" class="btn btn-sm btn-light border px-3 text-danger fw-bold shadow-sm" onclick="return confirm('Delete address?')">Delete</button>
                         </form>
                     </div>
                 }
@@ -132,88 +146,232 @@
             {
                 <div class="row g-4">
                     <div class="col-sm-6">
-                        <div class="p-3 bg-light rounded-3">
-                            <div class="small text-muted mb-1">Street</div>
-                            <div class="fw-bold">@Model.Address.Street</div>
+                        <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                            <h6 class="text-muted small text-uppercase fw-bold mb-2">Street Address</h6>
+                            <div class="fw-bold text-dark">@Model.Address.Street</div>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="p-3 bg-light rounded-3">
-                            <div class="small text-muted mb-1">City</div>
-                            <div class="fw-bold">@Model.Address.City</div>
+                        <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                            <h6 class="text-muted small text-uppercase fw-bold mb-2">City</h6>
+                            <div class="fw-bold text-dark">@Model.Address.City</div>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="p-3 bg-light rounded-3">
-                            <div class="small text-muted mb-1">State</div>
-                            <div class="fw-bold">@Model.Address.State</div>
+                        <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                            <h6 class="text-muted small text-uppercase fw-bold mb-2">State</h6>
+                            <div class="fw-bold text-dark">@Model.Address.State</div>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="p-3 bg-light rounded-3">
-                            <div class="small text-muted mb-1">Country</div>
-                            <div class="fw-bold">@Model.Address.Country</div>
+                        <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                            <h6 class="text-muted small text-uppercase fw-bold mb-2">Country</h6>
+                            <div class="fw-bold text-dark">@Model.Address.Country</div>
                         </div>
                     </div>
                 </div>
             }
             else
             {
-                <div class="text-center py-5 bg-light rounded-3">
-                    <i class="bi bi-geo-alt text-muted fs-1"></i>
-                    <p class="mt-3">No address records found for this employee.</p>
+                <div class="text-center py-5 bg-light bg-opacity-30 rounded-4 border border-dashed">
+                    <div class="bg-white p-4 rounded-circle shadow-sm d-inline-block mb-3">
+                        <i class="bi bi-geo-alt text-muted fs-1"></i>
+                    </div>
+                    <p class="mt-3 fw-bold text-muted">No address.</p>
+                    <p class="small text-muted opacity-75">Add an address to keep our records updated.</p>
+                </div>
+            }
+
+            <div class="mt-5 pt-4 border-top">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded text-primary">
+                        <i class="bi bi-mortarboard-fill fs-5"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">Qualifications</h5>
+                </div>
+
+                @if (Model.Qualifications.Count == 0)
+                {
+                    <div class="text-muted small">No qualifications provided.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Institution</th>
+                                    <th>Year</th>
+                                    <th>Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Qualifications)
+                                {
+                                    <tr>
+                                        <td>@item.Title</td>
+                                        <td>@item.Institution</td>
+                                        <td>@item.Year</td>
+                                        <td>@item.Grade</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+
+            <div class="mt-5 pt-4 border-top">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded text-primary">
+                        <i class="bi bi-people-fill fs-5"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">Next of Kin</h5>
+                </div>
+
+                @if (Model.NextOfKin == null)
+                {
+                    <div class="text-muted small">No next of kin details provided.</div>
+                }
+                else
+                {
+                    <div class="row g-4">
+                        <div class="col-sm-6">
+                            <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                                <h6 class="text-muted small text-uppercase fw-bold mb-2">Full Name</h6>
+                                <div class="fw-bold text-dark">@Model.NextOfKin.FullName</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                                <h6 class="text-muted small text-uppercase fw-bold mb-2">Relationship</h6>
+                                <div class="fw-bold text-dark">@Model.NextOfKin.Relationship</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                                <h6 class="text-muted small text-uppercase fw-bold mb-2">Phone Number</h6>
+                                <div class="fw-bold text-dark">@Model.NextOfKin.PhoneNumber</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                                <h6 class="text-muted small text-uppercase fw-bold mb-2">Address</h6>
+                                <div class="fw-bold text-dark">@Model.NextOfKin.Address</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="mt-5 pt-4 border-top">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded text-primary">
+                        <i class="bi bi-clipboard-check-fill fs-5"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">HR Information</h5>
+                </div>
+
+                @if (Model.HrInfo == null)
+                {
+                    <div class="text-muted small">No HR information provided.</div>
+                }
+                else
+                {
+                    <div class="row g-4">
+                        <div class="col-sm-4">
+                            <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                                <h6 class="text-muted small text-uppercase fw-bold mb-2">Date of Birth</h6>
+                                <div class="fw-bold text-dark">@Model.HrInfo.DateOfBirth.ToString("MMMM dd, yyyy")</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                                <h6 class="text-muted small text-uppercase fw-bold mb-2">Marital Status</h6>
+                                <div class="fw-bold text-dark">@Model.HrInfo.MaritalStatus</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                                <h6 class="text-muted small text-uppercase fw-bold mb-2">National ID</h6>
+                                <div class="fw-bold text-dark">@Model.HrInfo.NationalId</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                                <h6 class="text-muted small text-uppercase fw-bold mb-2">Blood Group</h6>
+                                <div class="fw-bold text-dark">@Model.HrInfo.BloodGroup</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="p-4 bg-light bg-opacity-50 rounded-4 border">
+                                <h6 class="text-muted small text-uppercase fw-bold mb-2">Genotype</h6>
+                                <div class="fw-bold text-dark">@Model.HrInfo.Genotype</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="mt-5 pt-4 border-top">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="bg-primary bg-opacity-10 p-2 rounded text-primary">
+                            <i class="bi bi-shield-lock-fill fs-5"></i>
+                        </div>
+                        <h5 class="fw-bold mb-0">Documents</h5>
+                    </div>
+
+                    @if (Model.Documents.Count == 0)
+                    {
+                        <div class="text-muted small">No documents uploaded yet.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive mb-4">
+                            <table class="table table-sm align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>File</th>
+                                        <th>Uploaded</th>
+                                        <th>Expiry</th>
+                                        <th>Link</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var doc in Model.Documents)
+                                    {
+                                        <tr>
+                                            <td>@doc.DocumentType</td>
+                                            <td>@doc.FileName</td>
+                                            <td>@doc.UploadedDate.ToString("MMM dd, yyyy")</td>
+                                            <td>@(doc.ExpiryDate?.ToString("MMM dd, yyyy") ?? "—")</td>
+                                            <td>
+                                                <a href="@doc.FileUrl" class="btn btn-sm btn-light border" target="_blank" rel="noopener">
+                                                    View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                    <div class="alert bg-primary bg-opacity-5 border-0 rounded-4 p-4 d-flex gap-3">
+                        <i class="bi bi-info-circle-fill text-primary-light fs-4"></i>
+                        <div class="small text-muted">
+                            <strong class="text-dark d-block mb-1">Privacy Policy</strong>
+                            All files are stored securely. Only authorized staff can see them.
+                        </div>
+                    </div>
                 </div>
             }
         </div>
     </div>
-
-    @if (User.IsInRole("Admin"))
-    {
-        <div class="col-lg-8 mt-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="fw-bold mb-0"><i class="bi bi-folder-fill me-2"></i>Document Vault</h5>
-                </div>
-                <div class="card-body p-4">
-                    <form asp-controller="Document" asp-action="Upload" method="post" enctype="multipart/form-data" class="mb-4 p-4 bg-light rounded-3">
-                        <input type="hidden" name="EmployeeId" value="@Model.Id" />
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold small">Document Type</label>
-                                <select name="DocumentType" class="form-select" required>
-                                    <option value="">Select Type</option>
-                                    <option value="ID Card">ID Card</option>
-                                    <option value="Passport">Passport</option>
-                                    <option value="Contract">Employment Contract</option>
-                                    <option value="Certificate">Certificate</option>
-                                    <option value="Resume">Resume/CV</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold small">Expiry Date (Optional)</label>
-                                <input type="date" name="ExpiryDate" class="form-control" />
-                            </div>
-                            <div class="col-md-5">
-                                <label class="form-label fw-bold small">Upload File</label>
-                                <input type="file" name="File" class="form-control" required accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" />
-                            </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary rounded-pill px-4">
-                                    <i class="bi bi-cloud-upload me-2"></i>Upload Document
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <div class="alert alert-info border-0">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <strong>Document Vault:</strong> Securely store employee documents like IDs, contracts, and certificates. Files are encrypted and stored in the cloud.
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
 </div>
 
 <form id="antiforgeryForm">

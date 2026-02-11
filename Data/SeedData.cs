@@ -1,4 +1,7 @@
+using Data.Context;
+using Data.Model;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Data;
@@ -19,6 +22,79 @@ public static class SeedData
             if (!roleExist)
             {
                 roleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
+            }
+        }
+
+        var dbContext = serviceProvider.GetRequiredService<EmployeeAppDbContext>();
+        var moduleKeys = new[]
+        {
+            "personal_details",
+            "qualifications",
+            "next_of_kin",
+            "hr_info",
+            "documents"
+        };
+
+        var existingModules = await dbContext.OnboardingModules
+            .Where(m => moduleKeys.Contains(m.Key))
+            .ToListAsync();
+
+        if (existingModules.Count != moduleKeys.Length)
+        {
+            var modules = new List<OnboardingModule>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Key = "personal_details",
+                    Name = "Personal Details",
+                    IsRequired = true,
+                    SortOrder = 1,
+                    Weight = 1
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Key = "qualifications",
+                    Name = "Qualifications",
+                    IsRequired = true,
+                    SortOrder = 2,
+                    Weight = 1
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Key = "next_of_kin",
+                    Name = "Next of Kin",
+                    IsRequired = true,
+                    SortOrder = 3,
+                    Weight = 1
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Key = "hr_info",
+                    Name = "HR Information",
+                    IsRequired = true,
+                    SortOrder = 4,
+                    Weight = 1
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Key = "documents",
+                    Name = "Documents",
+                    IsRequired = true,
+                    SortOrder = 5,
+                    Weight = 1
+                }
+            };
+
+            var missing = modules.Where(m => existingModules.All(e => e.Key != m.Key)).ToList();
+            if (missing.Count > 0)
+            {
+                dbContext.OnboardingModules.AddRange(missing);
+                await dbContext.SaveChangesAsync();
             }
         }
 

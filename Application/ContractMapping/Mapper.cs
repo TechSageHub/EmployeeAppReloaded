@@ -152,6 +152,7 @@ public static class Mapper
             Gender = employee.Gender,
             PhoneNumber = employee.PhoneNumber,
             DepartmentId = employee.DepartmentId,
+            DepartmentName = employee.Department?.Name ?? "Unassigned",
             ImageUrl = employee.ImageUrl,
             Address = employee.Address?.ToDto()
         };

@@ -18,6 +18,10 @@ namespace Presentation.Models
         public string DepartmentName { get; set; }
         public string? ImageUrl { get; set; }
         public AddressViewModel? Address { get; set; }
+        public List<QualificationViewModel> Qualifications { get; set; } = new();
+        public NextOfKinViewModel? NextOfKin { get; set; }
+        public HrInfoViewModel? HrInfo { get; set; }
+        public List<EmployeeDocumentDto> Documents { get; set; } = new();
     }
     public class CreateEmployeeViewModel
     {

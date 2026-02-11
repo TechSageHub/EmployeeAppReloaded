@@ -21,6 +21,11 @@ public class EmployeeAppDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Announcement> Announcements { get; set; }
     public DbSet<AttendanceLog> AttendanceLogs { get; set; }
     public DbSet<PerformanceAppraisal> PerformanceAppraisals { get; set; }
+    public DbSet<OnboardingModule> OnboardingModules { get; set; } = default!;
+    public DbSet<EmployeeOnboardingProgress> EmployeeOnboardingProgress { get; set; } = default!;
+    public DbSet<EmployeeQualification> EmployeeQualifications { get; set; } = default!;
+    public DbSet<EmployeeNextOfKin> EmployeeNextOfKins { get; set; } = default!;
+    public DbSet<EmployeeHrInfo> EmployeeHrInfos { get; set; } = default!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -3,56 +3,56 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - StaffHubSystem</title>
+    <title>@ViewData["Title"] - StaffHub Professional</title>
     <link rel="icon" type="image/png" href="~/favicon.png">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/slideshow.css" />
 </head>
 <body>
     <div class="app-shell">
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
         <aside class="sidebar" id="mainSidebar">
-            <div class="sidebar-header">
+            <div class="sidebar-header border-0 pb-0 mb-4">
                 <div class="sidebar-brand-wrapper">
-                    @if (User.Identity!.IsAuthenticated && User.IsInRole("Admin"))
-                    {
-                        <h1 class="sidebar-brand-title">Admin Panel</h1>
-                        <span class="sidebar-brand-subtitle">Welcome</span>
-                    }
-                    else
-                    {
-                        <h1 class="sidebar-brand-title">StaffHub</h1>
-                        <span class="sidebar-brand-subtitle">Workforce Management</span>
-                    }
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-primary-light rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                            <i class="bi bi-layers-half text-white fs-4"></i>
+                        </div>
+                        <div>
+                            <h1 class="sidebar-brand-title fs-4 mb-0" style="letter-spacing: -0.5px;">StaffHub<span class="text-primary-light">.</span></h1>
+                            <span class="sidebar-brand-subtitle opacity-50 small fw-bold text-uppercase" style="font-size: 0.6rem; letter-spacing: 1px;">Enterprise v2.0</span>
+                        </div>
+                    </div>
                 </div>
                 <button class="btn btn-close-sidebar d-lg-none" type="button" id="closeSidebar">
-                    <i class="bi bi-x"></i>
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
-            <div class="sidebar-nav-container" id="sidebarNav">
-                <ul class="nav flex-column">
+
+            <div class="sidebar-nav-container custom-scrollbar px-3" id="sidebarNav">
+                <div class="text-uppercase small fw-800 text-muted mb-3 mt-4 px-3" style="font-size: 0.65rem; letter-spacing: 1.5px; opacity: 0.4;">Menu</div>
+                <ul class="nav flex-column gap-1">
                     @if (User.Identity!.IsAuthenticated)
                     {
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                                <i class="bi bi-grid-1x2-fill"></i>Dashboard
                             </a>
                         </li>
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Employee" ? "active" : "")" asp-controller="Employee" asp-action="Index">
-                                    <i class="bi bi-people me-2"></i>Employees
+                                    <i class="bi bi-people-fill"></i>Employees
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Department" ? "active" : "")" asp-controller="Department" asp-action="Index">
-                                    <i class="bi bi-diagram-3 me-2"></i>Departments
+                                    <i class="bi bi-diagram-3-fill"></i>Departments
                                 </a>
                             </li>
                         }
@@ -60,45 +60,51 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "MyProfile" ? "active" : "")" asp-controller="Employee" asp-action="MyProfile">
-                                    <i class="bi bi-person-badge me-2"></i>View Profile
+                                    <i class="bi bi-person-badge-fill"></i>My Profile
                                 </a>
                             </li>
                         }
+                        
+                        <div class="text-uppercase small fw-800 text-muted mb-3 mt-4 px-3" style="font-size: 0.65rem; letter-spacing: 1.5px; opacity: 0.4;">Other</div>
+                        
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Leave" ? "active" : "")" asp-controller="Leave" asp-action="Index">
-                                <i class="bi bi-calendar2-check me-2"></i>Leave Portal
+                                <i class="bi bi-calendar-event-fill"></i>Leave Requests
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Attendance" ? "active" : "")" asp-controller="Attendance" asp-action="Index">
-                                <i class="bi bi-clock-history me-2"></i>Attendance
+                                <i class="bi bi-stopwatch-fill"></i>Attendance
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Announcement" ? "active" : "")" asp-controller="Announcement" asp-action="Index">
-                                <i class="bi bi-megaphone me-2"></i>Announcements
+                                <i class="bi bi-megaphone-fill"></i>Announcements
                             </a>
                         </li>
                     }
                 </ul>
             </div>
-            <div class="sidebar-footer">
+            
+            <div class="sidebar-footer p-3 border-top mt-auto bg-primary bg-opacity-10">
                 @if (User.Identity!.IsAuthenticated)
                 {
-                    <a class="nav-link footer-link" asp-controller="Account" asp-action="EditProfile">
-                        <i class="bi bi-pencil-square me-2"></i>Edit Profile
-                    </a>
-                    <a class="nav-link footer-link" asp-controller="Account" asp-action="ForgotPassword">
-                        <i class="bi bi-shield-lock me-2"></i>Reset Password
-                    </a>
-                    <a class="nav-link text-danger logout-link" asp-controller="Account" asp-action="Logout">
-                        <i class="bi bi-box-arrow-right me-2"></i>Logout
-                    </a>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-sm btn-light border-0 text-start px-3 py-2 fw-bold small text-muted hover-translate-x" asp-controller="Account" asp-action="EditProfile">
+                            <i class="bi bi-gear-fill me-2"></i>Profile Settings
+                        </a>
+                        <a class="btn btn-sm btn-light border-0 text-start px-3 py-2 fw-bold small text-muted hover-translate-x" asp-controller="Account" asp-action="ForgotPassword">
+                            <i class="bi bi-shield-lock-fill me-2"></i>Reset Password
+                        </a>
+                        <a class="btn btn-sm btn-light border-0 text-start px-3 py-2 fw-bold small text-danger hover-translate-x" asp-controller="Account" asp-action="Logout">
+                            <i class="bi bi-power me-2"></i>Logout
+                        </a>
+                    </div>
                 }
                 else
                 {
-                    <a class="nav-link logout-link" style="color: #cfd8e3 !important;" asp-controller="Account" asp-action="Login">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                    <a class="btn btn-premium btn-premium-primary w-100" asp-controller="Account" asp-action="Login">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
                     </a>
                 }
             </div>
@@ -107,35 +113,55 @@
         <div class="app-content">
             <header class="top-header">
                 <div class="container-fluid d-flex align-items-center justify-content-between px-4 h-100">
-                    <button class="btn btn-toggle-sidebar d-lg-none" type="button" id="toggleSidebar">
-                        <i class="bi bi-list"></i>
-                    </button>
-                    <div class="flex-grow-1 text-center">
-                        <h5 class="m-0 welcome-text">Welcome back</h5>
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-toggle-sidebar d-lg-none me-4 bg-light p-2 rounded-3 border" type="button" id="toggleSidebar">
+                            <i class="bi bi-list fs-5"></i>
+                        </button>
+                        <div class="d-none d-md-block">
+                            <h5 class="m-0 welcome-text opacity-50 small text-uppercase ls-wide fw-bold">Page</h5>
+                            <h4 class="m-0 fw-800" style="color: var(--primary-color);">@ViewData["Title"]</h4>
+                        </div>
                     </div>
-                    <div class="top-header-right">
-                        <span class="badge badge-date">@DateTime.Now.ToString("MMM dd, yyyy")</span>
+                    
+                    <div class="top-header-right d-flex align-items-center gap-4">
+                        <div class="d-none d-sm-flex align-items-center gap-2 bg-light px-3 py-2 rounded-pill border">
+                            <i class="bi bi-calendar3 text-primary-light small"></i>
+                            <span class="small fw-bold text-muted">@DateTime.Now.ToString("dd'xx' MMMM, yyyy").Replace("xx", GetDaySuffix(DateTime.Now.Day))</span>
+                        </div>
+                        
+                        <div class="d-flex align-items-center gap-3 ps-3 border-start">
+                            <div class="d-none d-md-block text-end">
+                                <div class="small fw-800 text-dark">@User.Identity?.Name</div>
+                                <div class="badge bg-success bg-opacity-10 text-success border-0 small p-0" style="font-size: 0.65rem;">Online</div>
+                            </div>
+                            <div class="avatar-md bg-white border border-2 border-primary border-opacity-25 p-1 rounded-circle shadow-sm overflow-hidden" style="width: 42px; height: 42px;">
+                                <div class="w-100 h-100 bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-primary-light fw-bold">
+                                    @User.Identity?.Name?[0]
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>
+
             <main role="main" class="content-main">
-                <div class="container">
+                <div class="container pb-5">
                     @await Html.PartialAsync("_FlashMessage")
                     @RenderBody()
                 </div>
             </main>
 
-            <footer class="footer text-muted border-top py-4 mt-auto">
+            <footer class="footer bg-white border-top py-4 mt-auto">
                 <div class="container">
-                    <div class="row align-items-center">
+                    <div class="row align-items-center g-4">
                         <div class="col-md-6 text-center text-md-start">
-                            &copy; 2026 - StaffHubSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-decoration-none text-muted">Privacy Policy</a>
+                            <div class="text-muted small opacity-75">&copy; @DateTime.Now.Year StaffHub. All rights reserved.</div>
                         </div>
-                        <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
-                            <div class="social-links">
-                                <a href="#" class="text-muted me-3 fs-5"><i class="bi bi-twitter"></i></a>
-                                <a href="#" class="text-muted me-3 fs-5"><i class="bi bi-facebook"></i></a>
-                                <a href="#" class="text-muted fs-5"><i class="bi bi-linkedin"></i></a>
+                        <div class="col-md-6 text-center text-md-end">
+                            <div class="d-flex gap-4 justify-content-center justify-content-md-end opacity-50">
+                                <a href="#" class="text-muted small text-decoration-none hover-text-primary">About</a>
+                                <a href="#" class="text-muted small text-decoration-none hover-text-primary">Privacy</a>
+                                <a href="#" class="text-muted small text-decoration-none hover-text-primary">Terms</a>
                             </div>
                         </div>
                     </div>
@@ -143,6 +169,17 @@
             </footer>
         </div>
     </div>
+
+    @functions {
+        public string GetDaySuffix(int day) {
+            switch (day % 10) {
+                case 1: return "st";
+                case 2: return "nd";
+                case 3: return "rd";
+                default: return "th";
+            }
+        }
+    }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -164,7 +201,6 @@
             close.on('click', toggleSidebar);
             overlay.on('click', toggleSidebar);
 
-            // Close on nav link click (for SPA-like feel if needed)
             $('.sidebar .nav-link').on('click', function() {
                 if ($(window).width() < 992) {
                     toggleSidebar();

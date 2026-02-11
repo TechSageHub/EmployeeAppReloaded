@@ -8,6 +8,7 @@ using System.Text;
 using Application.Services.Authentication;
 using Application.Services.Employee;
 using Application.Services.UploadImage;
+using Application.Services.Onboarding;
 using System.Security.Claims;
 #pragma warning disable CS0105 // The using directive for 'Application.Dtos' appeared previously in this namespace
 using Application.Dtos; 
@@ -23,6 +24,7 @@ namespace Presentation.Controllers
         private readonly INotyfService _notyf;
         private readonly IEmployeeService _employeeService;
         private readonly IImageService _imageService;
+        private readonly IOnboardingService _onboardingService;
 
         public AccountController
             (
@@ -31,7 +33,8 @@ namespace Presentation.Controllers
             SignInManager<IdentityUser> signInManager,
             INotyfService notyf,
             IEmployeeService employeeService,
-            IImageService imageService)
+            IImageService imageService,
+            IOnboardingService onboardingService)
         {
             _authService = authService;
             _userManager = userManager;
@@ -39,6 +42,7 @@ namespace Presentation.Controllers
             _notyf = notyf;
             _employeeService = employeeService;
             _imageService = imageService;
+            _onboardingService = onboardingService;
         }
         [HttpGet]
         public IActionResult ConfirmPrompt(string email)
@@ -88,21 +92,31 @@ namespace Presentation.Controllers
                 return View(model);
             }
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var email = model.Email?.Trim();
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                _notyf.Error("Please enter a valid email.");
+                ModelState.AddModelError(string.Empty, "Please enter a valid email.");
+                return View(model);
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
             {
                 _notyf.Error("User not found.");
+                ModelState.AddModelError(string.Empty, "User not found.");
                 return View(model);
             }
 
             if (!await _userManager.IsEmailConfirmedAsync(user))
             {
                 _notyf.Error("Please confirm your email before logging in.");
+                ModelState.AddModelError(string.Empty, "Please confirm your email before logging in.");
                 return View(model);
             }
 
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
+            var result = await _signInManager.PasswordSignInAsync(email, model.Password, model.RememberMe, lockoutOnFailure: true);
 
            
             if (result.IsLockedOut)
@@ -110,12 +124,23 @@ namespace Presentation.Controllers
                 var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user);
                 var remaining = lockoutEnd?.LocalDateTime - DateTime.Now;
                 _notyf.Error($"Your account is locked. Try again in {remaining?.Minutes} minutes.");
+                ModelState.AddModelError(string.Empty, "Your account is locked. Please try again later.");
                 return View(model);
             }
 
            
             if (result.Succeeded)
             {
+                var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+                if (!isAdmin)
+                {
+                    var isComplete = await _onboardingService.IsOnboardingCompleteAsync(user.Id);
+                    if (!isComplete)
+                    {
+                        return RedirectToAction("Index", "Onboarding");
+                    }
+                }
+
                 return RedirectToAction("Index", "Home");
             }
 
@@ -126,6 +151,7 @@ namespace Presentation.Controllers
             var attemptsLeft = maxAttempts - accessFailedCount;
 
             _notyf.Warning($"Invalid login credentials. You have {attemptsLeft} more attempt(s) before your account is locked.");
+            ModelState.AddModelError(string.Empty, "Invalid login credentials.");
             return View(model);
         }
 

@@ -1,94 +1,126 @@
 @model List<Application.Dtos.LeaveRequestDto>
 @{
-    ViewData["Title"] = "My Leave History";
+    ViewData["Title"] = "Leave Portal";
 }
 
-<div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h2 class="fw-bold mb-0">My Leave Portal</h2>
-            <p class="text-muted">Manage your time off requests and track your balance.</p>
-        </div>
-        <div class="col-md-4 text-md-end">
-            <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm">
-                <i class="bi bi-plus-lg me-2"></i>Request Leave
-            </a>
-        </div>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5 mt-2">
+    <div>
+        <h5 class="text-muted small text-uppercase ls-wide fw-bold mb-1">Leave</h5>
+        <h2 class="fw-bold mb-0">My Leave</h2>
     </div>
+    <div class="d-flex align-items-center gap-3">
+        <a asp-action="Create" class="btn btn-premium btn-premium-primary">
+            <i class="bi bi-calendar2-plus"></i> Request Leave
+        </a>
+    </div>
+</div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4">
-                <h6 class="text-uppercase small fw-bold opacity-75 mb-1">Annual Balance</h6>
-                <h2 class="fw-bold mb-0">@ViewBag.RemainingDays Days</h2>
-                <div class="mt-2 small opacity-75">Remaining for this year</div>
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card-premium p-4 border-start border-4 border-primary">
+            <div class="d-flex align-items-center gap-4">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
+                    <i class="bi bi-calendar-check fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted small text-uppercase fw-bold mb-1 ls-wide">Available Leave</h6>
+                    <div class="fs-2 fw-bold text-dark">@ViewBag.RemainingDays <span class="fs-6 text-muted fw-normal">days left</span></div>
+                    <div class="small text-muted opacity-75 mt-1">Your leave for this year</div>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-        <div class="card-header bg-white border-0 py-3">
-            <h5 class="fw-bold mb-0">Leave History</h5>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
+<div class="card-premium overflow-hidden">
+    <div class="p-4 border-bottom bg-light bg-opacity-30 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">Leave History</h5>
+        <span class="badge bg-white text-muted border px-2 py-1 small fw-bold shadow-sm">Log</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table-modern mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Type</th>
+                        <th>Dates</th>
+                        <th>Days</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Request Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
                         <tr>
-                            <th class="ps-4">Type</th>
-                            <th>Period</th>
-                            <th>Days</th>
-                            <th>Status</th>
-                            <th class="text-end pe-4">Date Requested</th>
+                            <td colspan="5" class="text-center py-5 opacity-50">
+                                <div class="bg-light p-4 rounded-circle d-inline-block mb-3">
+                                    <i class="bi bi-calendar-x fs-1"></i>
+                                </div>
+                                <p class="fs-5 fw-bold mb-0">No leave requests found.</p>
+                                <p class="small">You haven't requested any leave yet.</p>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (!Model.Any())
-                        {
-                            <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">
-                                    <i class="bi bi-calendar-x fs-1 opacity-25 d-block mb-2"></i>
-                                    No leave requests found.
-                                </td>
-                            </tr>
-                        }
+                    }
+                    else
+                    {
                         @foreach (var leave in Model)
                         {
                             <tr>
                                 <td class="ps-4">
-                                    <span class="fw-medium">@leave.LeaveType</span>
-                                    @if (!string.IsNullOrEmpty(leave.Reason))
-                                    {
-                                        <div class="small text-muted">@leave.Reason</div>
-                                    }
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-dark">@leave.LeaveType</span>
+                                        @if (!string.IsNullOrEmpty(leave.Reason))
+                                        {
+                                            <span class="small text-muted opacity-75 text-truncate" style="max-width: 250px;">@leave.Reason</span>
+                                        }
+                                    </div>
                                 </td>
                                 <td>
-                                    <div class="small fw-medium">@leave.StartDate.ToString("MMM dd") - @leave.EndDate.ToString("MMM dd, yyyy")</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-clock-history text-muted small"></i>
+                                        <span class="small fw-bold text-dark">@leave.StartDate.ToString("MMM dd") — @leave.EndDate.ToString("MMM dd, yyyy")</span>
+                                    </div>
                                 </td>
-                                <td>@leave.DurationInDays</td>
+                                <td>
+                                    <span class="badge bg-light bg-opacity-50 text-dark border-0 px-3 py-2 fw-bold">
+                                        @leave.DurationInDays Days
+                                    </span>
+                                </td>
                                 <td>
                                     @switch (leave.Status)
                                     {
                                         case "Approved":
-                                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Approved</span>
+                                            <div class="d-flex align-items-center gap-2 text-success fw-bold small">
+                                                <i class="bi bi-check-circle-fill"></i>
+                                                <span>Approved</span>
+                                            </div>
                                             break;
                                         case "Rejected":
-                                            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">Rejected</span>
+                                            <div class="d-flex align-items-center gap-2 text-danger fw-bold small">
+                                                <i class="bi bi-x-circle-fill"></i>
+                                                <span>Rejected</span>
+                                            </div>
                                             break;
                                         case "Pending":
-                                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">Pending</span>
+                                            <div class="d-flex align-items-center gap-2 text-warning fw-bold small">
+                                                <i class="bi bi-hourglass-split"></i>
+                                                <span>Pending</span>
+                                            </div>
                                             break;
                                         default:
-                                            <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3">@leave.Status</span>
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2">@leave.Status.ToUpper()</span>
                                             break;
                                     }
                                 </td>
-                                <td class="text-end pe-4 text-muted small">@leave.DateRequested.ToString("MMM dd, yyyy")</td>
+                                <td class="text-end pe-4">
+                                    <span class="text-muted small fw-medium">@leave.DateRequested.ToString("MMM dd, yyyy")</span>
+                                </td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

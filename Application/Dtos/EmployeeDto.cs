@@ -20,6 +20,9 @@ public class EmployeeDto
     public string? City { get; set; }
     public string? State { get; set; }
     public AddressDto? Address { get; set; }
+    public List<QualificationDto> Qualifications { get; set; } = new();
+    public NextOfKinDto? NextOfKin { get; set; }
+    public HrInfoDto? HrInfo { get; set; }
 }
 
 public class  EmployeesDto 

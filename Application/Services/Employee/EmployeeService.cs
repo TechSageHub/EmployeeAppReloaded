@@ -10,8 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Application.Services.Email;
-using Microsoft.AspNetCore.WebUtilities;
-using System.Text;
 
 namespace Application.Services.Employee;
 
@@ -39,8 +37,18 @@ public class EmployeeService : IEmployeeService
 
     private static string GenerateTempPassword()
     {
-        // Ensure password meets typical complexity requirements.
-        return $"Aa1!{Guid.NewGuid():N}".Substring(0, 16);
+        const string allowed = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+        var bytes = new byte[8];
+        System.Security.Cryptography.RandomNumberGenerator.Fill(bytes);
+        var suffix = new char[bytes.Length];
+
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            suffix[i] = allowed[bytes[i] % allowed.Length];
+        }
+
+        // Ensures: uppercase, lowercase, digit, non-alphanumeric, and min length.
+        return $"Aa1!{new string(suffix)}";
     }
 
     public async Task<EmployeeDto?> CreateEmployeeAsync(CreateEmployeeDto dto)
@@ -54,6 +62,7 @@ public class EmployeeService : IEmployeeService
             }
 
             IdentityUser? user = null;
+            string? tempPassword = null;
             var isExistingIdentityUser = !string.IsNullOrWhiteSpace(dto.UserId);
 
             await using var transaction = await _context.Database.BeginTransactionAsync();
@@ -86,7 +95,7 @@ public class EmployeeService : IEmployeeService
                 }
 
                 // Create Identity User for the employee
-                var tempPassword = GenerateTempPassword();
+                tempPassword = GenerateTempPassword();
                 user = new IdentityUser
                 {
                     UserName = dto.Email,
@@ -138,16 +147,13 @@ public class EmployeeService : IEmployeeService
 
             if (!isExistingIdentityUser)
             {
-                // Send Onboarding Email with password reset link
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
                 var request = _httpContextAccessor.HttpContext?.Request;
                 var baseUrl = request == null ? string.Empty : $"{request.Scheme}://{request.Host}";
-                var resetLink = string.IsNullOrEmpty(baseUrl)
+                var loginLink = string.IsNullOrEmpty(baseUrl)
                     ? "#"
-                    : $"{baseUrl}/Account/ResetPassword?email={dto.Email}&token={encodedToken}";
+                    : $"{baseUrl}/Account/Login";
 
-                var subject = "Welcome to StaffHub - Set Your Password";
+                var subject = "Welcome to StaffHub - Your Login Details";
                 var body = $@"
                     <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;'>
                         <h2 style='color: #0d6efd;'>Welcome to the Team, {dto.FirstName}!</h2>
@@ -157,10 +163,11 @@ public class EmployeeService : IEmployeeService
                         <div style='background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;'>
                             <h4 style='margin-top: 0;'>Your Login Username:</h4>
                             <p style='margin-bottom: 0;'><strong>Email/Username:</strong> {dto.Email}</p>
+                            <p style='margin: 8px 0 0 0;'><strong>Temporary Password:</strong> {tempPassword}</p>
                         </div>
 
-                        <p>For security, please set your password using the link below:</p>
-                        <a href='{resetLink}' style='display: inline-block; background-color: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 10px;'>Set Password</a>
+                        <p>Please log in with the temporary password below and complete your profile.</p>
+                        <a href='{loginLink}' style='display: inline-block; background-color: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 10px;'>Go to StaffHub</a>
 
                         <hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>
                         <p style='font-size: 12px; color: #777;'>Sent from StaffHub Employee Management System.</p>
@@ -244,7 +251,13 @@ public class EmployeeService : IEmployeeService
 
     public async Task<EmployeeDto> GetEmployeeByIdAsync(Guid employeeId, string? userId = null)
     {
-        var query = _context.Employees.Include(e => e.Address).AsQueryable();
+        var query = _context.Employees
+            .Include(e => e.Address)
+            .Include(e => e.Department)
+            .Include(e => e.Qualifications)
+            .Include(e => e.NextOfKin)
+            .Include(e => e.HrInfo)
+            .AsQueryable();
         var user = _httpContextAccessor.HttpContext?.User;
         var isAdmin = user?.IsInRole("Admin") ?? false;
 
@@ -270,6 +283,7 @@ public class EmployeeService : IEmployeeService
             Gender = employee.Gender,
             PhoneNumber = employee.PhoneNumber,
             ImageUrl = employee.ImageUrl,
+            DepartmentName = employee.Department?.Name ?? "Unassigned",
             Address = employee.Address == null ? null : new AddressDto
             {
                 Id = employee.Address.Id,
@@ -278,7 +292,36 @@ public class EmployeeService : IEmployeeService
                 EmployeeId = employee.Id,
                 Street = employee.Address.Street,
                 State = employee.Address.State
-            }
+            },
+            Qualifications = employee.Qualifications
+                .OrderByDescending(q => q.Year)
+                .Select(q => new QualificationDto
+                {
+                    Title = q.Title,
+                    Institution = q.Institution,
+                    Year = q.Year,
+                    Grade = q.Grade
+                })
+                .ToList(),
+            NextOfKin = employee.NextOfKin == null
+                ? null
+                : new NextOfKinDto
+                {
+                    FullName = employee.NextOfKin.FullName,
+                    Relationship = employee.NextOfKin.Relationship,
+                    PhoneNumber = employee.NextOfKin.PhoneNumber,
+                    Address = employee.NextOfKin.Address
+                },
+            HrInfo = employee.HrInfo == null
+                ? null
+                : new HrInfoDto
+                {
+                    DateOfBirth = employee.HrInfo.DateOfBirth,
+                    MaritalStatus = employee.HrInfo.MaritalStatus,
+                    NationalId = employee.HrInfo.NationalId,
+                    BloodGroup = employee.HrInfo.BloodGroup,
+                    Genotype = employee.HrInfo.Genotype
+                }
         };
     }
 

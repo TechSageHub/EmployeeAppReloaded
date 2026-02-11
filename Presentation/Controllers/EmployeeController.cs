@@ -2,6 +2,7 @@
 using Application.Services.Department;
 using Application.Services.Employee;
 using Application.Services.Address;
+using Application.Services.Document;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,13 +20,15 @@ public class EmployeeController : BaseController
     private readonly IDepartmentService _departmentService;
     private readonly INotyfService _notyf;
     private readonly IAddressService _addressService;
+    private readonly IDocumentService _documentService;
 
-    public EmployeeController(IEmployeeService employeeService, INotyfService notyf, IDepartmentService departmentService, IAddressService addressService)
+    public EmployeeController(IEmployeeService employeeService, INotyfService notyf, IDepartmentService departmentService, IAddressService addressService, IDocumentService documentService)
     {
         _employeeService = employeeService;
         _departmentService = departmentService;
         _notyf = notyf;
         _addressService = addressService;
+        _documentService = documentService;
     }
 
     
@@ -77,6 +80,8 @@ public class EmployeeController : BaseController
         if (employeeDto == null)
             return NotFound();
 
+        var documents = await _documentService.GetEmployeeDocumentsAsync(employeeDto.Id);
+
         var viewModel = new EmployeeViewModel
         {
             Id = employeeDto.Id,
@@ -97,7 +102,30 @@ public class EmployeeController : BaseController
                 Country = employeeDto.Address.Country,
                 EmployeeId = employeeDto.Address.EmployeeId,
                 Street = employeeDto.Address.Street
-            }
+            },
+            Qualifications = employeeDto.Qualifications.Select(q => new QualificationViewModel
+            {
+                Title = q.Title,
+                Institution = q.Institution,
+                Year = q.Year,
+                Grade = q.Grade
+            }).ToList(),
+            NextOfKin = employeeDto.NextOfKin == null ? null : new NextOfKinViewModel
+            {
+                FullName = employeeDto.NextOfKin.FullName,
+                Relationship = employeeDto.NextOfKin.Relationship,
+                PhoneNumber = employeeDto.NextOfKin.PhoneNumber,
+                Address = employeeDto.NextOfKin.Address
+            },
+            HrInfo = employeeDto.HrInfo == null ? null : new HrInfoViewModel
+            {
+                DateOfBirth = employeeDto.HrInfo.DateOfBirth,
+                MaritalStatus = employeeDto.HrInfo.MaritalStatus,
+                NationalId = employeeDto.HrInfo.NationalId,
+                BloodGroup = employeeDto.HrInfo.BloodGroup,
+                Genotype = employeeDto.HrInfo.Genotype
+            },
+            Documents = documents
         };
 
         return View(viewModel);

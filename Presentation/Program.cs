@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Data;
 using Microsoft.Extensions.DependencyInjection;
+using Presentation.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+    options.Filters.AddService<OnboardingCompletionFilter>();
 });
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
@@ -63,6 +65,7 @@ builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailS
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IStateService, StateService>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<OnboardingCompletionFilter>();
 
 builder.Services.AddHttpContextAccessor();
 

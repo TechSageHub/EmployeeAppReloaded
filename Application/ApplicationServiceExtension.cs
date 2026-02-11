@@ -6,6 +6,7 @@ using Application.Services.Leave;
 using Application.Services.Announcement;
 using Application.Services.Attendance;
 using Application.Services.Document;
+using Application.Services.Onboarding;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -21,6 +22,7 @@ public static class ApplicationServiceExtension
         services.AddScoped<IAnnouncementService, AnnouncementService>();
         services.AddScoped<IAttendanceService, AttendanceService>();
         services.AddScoped<IDocumentService, DocumentService>();
+        services.AddScoped<IOnboardingService, OnboardingService>();
 
         return services;
     }
